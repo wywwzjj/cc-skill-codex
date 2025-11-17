@@ -1,0 +1,13 @@
+{
+  "name": "cc-skill-codex-marketplace",
+  "owner": {
+    "name": "wywwzjj"
+  },
+  "plugins": [
+    {
+      "name": "cc-skill-codex",
+      "source": "./",
+      "description": "Invoke Codex CLI for high-reasoning tasks with GPT-5.1 capabilities. Codex = Brain (design, review, debug analysis), Claude = Hands (implementation). Supports session continuation with persistent context."
+    }
+  ]
+}
