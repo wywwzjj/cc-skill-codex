@@ -29,6 +29,25 @@ codex exec resume --last
 
 ---
 
+### Error 1.5: Multi-line Prompt Parsing Error
+
+**Error**: `error: the argument '--last' cannot be used with '[SESSION_ID]'`
+
+**Cause**: Either unescaped newlines in Bash arguments, OR adding `-` after `--last` (the `-` gets parsed as SESSION_ID).
+
+**Solution**:
+```bash
+# ✅ Use heredoc (NO trailing -)
+codex exec resume --last <<'EOF'
+Multi-line prompt here
+EOF
+
+# ❌ WRONG - Don't add - after --last
+codex exec resume --last -
+```
+
+---
+
 ### Error 2: "stdout is not a terminal"
 
 **Error Message**:

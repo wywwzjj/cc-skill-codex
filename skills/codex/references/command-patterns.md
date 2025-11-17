@@ -37,13 +37,14 @@
 
 ### Command
 ```bash
-codex exec -m gpt-5.1 -s read-only \
-  -c model_reasoning_effort=high \
-  "Design a REST API architecture for a blog system. Focus on:\n\
-  - Resource modeling\n\
-  - Endpoint design\n\
-  - Authentication strategy\n\
-  - Scalability considerations"
+# Use heredoc for multi-line prompts
+codex exec -m gpt-5.1 -s read-only -c model_reasoning_effort=high <<'EOF'
+Design a REST API architecture for a blog system. Focus on:
+- Resource modeling
+- Endpoint design
+- Authentication strategy
+- Scalability considerations
+EOF
 ```
 
 ### Codex Output

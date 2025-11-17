@@ -7,22 +7,28 @@ description: Invoke Codex CLI for high-reasoning tasks requiring GPT-5.1 capabil
 
 ---
 
-## ⚠️ CRITICAL: Always Use `codex exec`
+## ⚠️ CRITICAL Requirements
 
-**MUST USE**: `codex exec` for ALL Codex CLI invocations in Claude Code.
+### Always Use `codex exec`
+- ✅ `codex exec` (non-interactive mode)
+- ❌ `codex` (interactive mode fails in Claude Code)
 
-❌ **NEVER USE**: `codex` (interactive mode) - will fail with "stdout is not a terminal"
-✅ **ALWAYS USE**: `codex exec` (non-interactive mode)
+### Multi-line Prompts: Use Heredoc
+```bash
+# ✅ CORRECT - heredoc (auto-reads from stdin)
+codex exec resume --last <<'EOF'
+Multi-line prompt
+EOF
 
-**Examples:**
-- ✅ `codex exec -m gpt-5.1 "prompt"` (CORRECT)
-- ✅ `codex exec resume --last "continue prompt"` (CORRECT - must include prompt)
-- ✅ `echo "prompt" | codex exec resume --last -` (CORRECT - stdin with -)
-- ❌ `codex exec resume --last` (WRONG - missing prompt, will error)
-- ❌ `codex -m gpt-5.1 "prompt"` (WRONG - interactive mode fails)
-- ❌ `codex resume --last "prompt"` (WRONG - must use `codex exec`)
+# ❌ WRONG - unescaped newlines
+codex exec resume --last "Line 1
+Line 2"
 
-**Why?** Claude Code's bash environment is non-terminal/non-interactive. Only `codex exec` works in this environment.
+# ❌ WRONG - don't add `-` (parsed as SESSION_ID)
+codex exec resume --last -
+```
+
+**Key**: When PROMPT omitted, `codex exec` auto-reads stdin. Never add `-` after `--last`.
 
 ---
 
@@ -99,16 +105,18 @@ Detect continuation when user says:
 
 ### How to Resume
 
-**IMPORTANT**: Prompt is **required**.
+Prompt is **required**:
 
 ```bash
-# ✅ Resume with prompt (required)
+# ✅ Single-line prompt
 codex exec resume --last "Add error handling"
 
-# ✅ Pipe via stdin
-echo "Continue implementation" | codex exec resume --last -
+# ✅ Multi-line: use heredoc (see CRITICAL Requirements above)
+codex exec resume --last <<'EOF'
+Multi-line prompt here
+EOF
 
-# ❌ WRONG - will fail with "No prompt provided"
+# ❌ WRONG - missing prompt
 codex exec resume --last
 ```
 
@@ -123,37 +131,16 @@ codex exec resume --last
 
 **Sessions auto-save** - no manual tracking needed. See `references/session-workflows.md` for detailed examples and workflows.
 
-## Error Handling
+## Common Errors
 
-When errors occur, return clear, actionable messages:
+| Error | Fix |
+|-------|-----|
+| No prompt provided | Add prompt: `codex exec resume --last "prompt"` |
+| Multi-line parsing error | Use heredoc (see CRITICAL Requirements) |
+| stdout is not a terminal | Use `codex exec`, not `codex` |
+| Not authenticated | Run `codex login` |
 
-### Common Errors
-
-**No Prompt Provided**
-```
-Error: No prompt provided
-Fix: codex exec resume --last "your prompt here"
-```
-
-**Not Authenticated**
-```
-Error: Not authenticated with Codex
-Fix: Run 'codex login' to authenticate
-```
-
-**Command Not Found**
-```
-Error: Codex CLI not found
-Fix: Install Codex CLI - check with 'codex --version'
-```
-
-**"stdout is not a terminal"**
-```
-Error: stdout is not a terminal
-Fix: Use 'codex exec', not 'codex'
-```
-
-See `references/troubleshooting.md` for complete error reference, solutions, and troubleshooting workflows.
+See `references/troubleshooting.md` for details.
 
 ## Quick Examples
 

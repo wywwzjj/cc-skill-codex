@@ -47,14 +47,18 @@ codex exec -m gpt-5.1 -s read-only \
 ---
 
 ### Follow-Up Request (Same Session)
-**User**: "Continue with Codex - add thread-safety to the queue"
+**User**: "Continue with Codex - add thread-safety to the queue. Please ensure it handles concurrent access properly and includes proper locking mechanisms."
 
 **Skill Detects**: "Continue with Codex" keyword
 
-**Skill Executes**:
+**Skill Executes** (using heredoc for multi-line prompt):
 ```bash
-codex exec resume --last "Add thread-safety to the queue"
+codex exec resume --last <<'EOF'
+Add thread-safety to the queue. Please ensure it handles concurrent access properly and includes proper locking mechanisms.
+EOF
 ```
+
+**Note**: For single-line prompts, direct quotes work too: `codex exec resume --last "Add thread-safety to the queue"`
 
 **Codex Response**: Resumes previous session, maintains context about the queue design, and adds thread-safety implementation building on the previous discussion.
 
