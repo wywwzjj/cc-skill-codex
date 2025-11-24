@@ -16,12 +16,9 @@ Error: No prompt provided. Either specify one as an argument or pipe the prompt 
 **Solutions**:
 ```bash
 # ✅ Solution 1: Direct prompt argument
-codex exec resume --last "your prompt here"
+codex exec -m gpt-5.1 resume --last "your prompt here"
 
-# ✅ Solution 2: Pipe via stdin
-echo "your prompt" | codex exec resume --last -
-
-# ❌ WRONG - will always fail
+# ❌ WRONG - will always fail (no prompt)
 codex exec resume --last
 ```
 
@@ -38,13 +35,55 @@ codex exec resume --last
 **Solution**:
 ```bash
 # ✅ Use heredoc (NO trailing -)
-codex exec resume --last <<'EOF'
+codex exec -m gpt-5.1 resume --last <<'EOF'
 Multi-line prompt here
 EOF
 
 # ❌ WRONG - Don't add - after --last
-codex exec resume --last -
+codex exec -m gpt-5.1 resume --last -
 ```
+
+---
+
+### Error 1.6: Model Mismatch Warning on Resume
+
+**Warning**: `This session was recorded with model 'gpt-5.1' but is resuming with 'gpt-5.1-codex'`
+
+**Cause**: Not specifying model when resuming, causing Codex to use default model instead of original session's model.
+
+**Solution**:
+```bash
+# ✅ Always specify model matching original session (-m before resume)
+codex exec -m gpt-5.1 resume --last "continue"
+
+# Or with explicit session ID
+codex exec -m gpt-5.1 resume "$SESSION_ID" "continue"
+```
+
+---
+
+### Error 1.7: Session Confusion with Multiple Claude Code Instances
+
+**Problem**: When running multiple Claude Code instances, `--last` may resume the wrong session because it points to the globally most recent session.
+
+**Cause**: `--last` is global across all Codex sessions, not scoped to individual Claude Code instances.
+
+**Solutions**:
+
+**Option 1**: Track session ID explicitly
+```bash
+# Capture session ID from first call
+SESSION_ID=$(codex exec -m gpt-5.1 "prompt" 2>&1 | grep -o 'session id: [a-f0-9-]*' | cut -d' ' -f3)
+
+# Resume with specific session ID and model (-m before resume)
+codex exec -m gpt-5.1 resume "$SESSION_ID" <<'EOF'
+Continue prompt
+EOF
+```
+
+**Option 2**: Use only one Claude Code instance with Codex at a time
+
+**Option 3**: Use session naming/tagging (if available in future Codex CLI versions)
 
 ---
 
@@ -65,7 +104,7 @@ codex resume --last "prompt"
 
 # ✅ CORRECT - use codex exec
 codex exec -m gpt-5.1 "prompt"
-codex exec resume --last "prompt"
+codex exec -m gpt-5.1 resume --last "prompt"
 ```
 
 **Why**: Claude Code's bash environment is non-TTY (non-interactive). Only `codex exec` works in this environment.
@@ -197,7 +236,7 @@ codex exec -m gpt-5.1 "Your initial prompt"
 
 2. **Then resume in subsequent requests**:
 ```bash
-codex exec resume --last "Continue with..."
+codex exec -m gpt-5.1 resume --last "Continue with..."
 ```
 
 **Note**: Sessions only exist after you've run at least one `codex exec` command.

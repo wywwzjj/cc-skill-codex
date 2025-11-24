@@ -37,6 +37,8 @@ Unlike Claude's conversation context (which resets when you close Claude Code), 
 ```bash
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
+  -c hide_agent_reasoning=true \
+  -c model_reasoning_summary=concise \
   "Help me design a queue data structure in Python"
 ```
 
@@ -53,12 +55,12 @@ codex exec -m gpt-5.1 -s read-only \
 
 **Skill Executes** (using heredoc for multi-line prompt):
 ```bash
-codex exec resume --last <<'EOF'
+codex exec -m gpt-5.1 resume --last <<'EOF'
 Add thread-safety to the queue. Please ensure it handles concurrent access properly and includes proper locking mechanisms.
 EOF
 ```
 
-**Note**: For single-line prompts, direct quotes work too: `codex exec resume --last "Add thread-safety to the queue"`
+**Note**: Always specify `-m gpt-5.1` (before `resume`) to match original session model. For single-line: `codex exec -m gpt-5.1 resume --last "prompt"`
 
 **Codex Response**: Resumes previous session, maintains context about the queue design, and adds thread-safety implementation building on the previous discussion.
 
@@ -74,6 +76,8 @@ EOF
 ```bash
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
+  -c hide_agent_reasoning=true \
+  -c model_reasoning_summary=concise \
   "Design a REST API for a blog system"
 ```
 
@@ -86,7 +90,7 @@ codex exec -m gpt-5.1 -s read-only \
 
 **Skill Executes**:
 ```bash
-codex exec resume --last "Add authentication to the API"
+codex exec -m gpt-5.1 resume --last "Add authentication to the API"
 ```
 
 **Output**: Codex continues from previous API design and adds JWT/OAuth authentication strategy.
@@ -98,7 +102,7 @@ codex exec resume --last "Add authentication to the API"
 
 **Skill Executes**:
 ```bash
-codex exec resume --last "Add comprehensive error handling"
+codex exec -m gpt-5.1 resume --last "Add comprehensive error handling"
 ```
 
 **Output**: Codex builds on previous API + auth design and adds error handling patterns.
@@ -110,7 +114,7 @@ codex exec resume --last "Add comprehensive error handling"
 
 **Skill Executes**:
 ```bash
-codex exec resume --last "Implement the user authentication endpoint"
+codex exec -m gpt-5.1 resume --last "Implement the user authentication endpoint"
 ```
 
 **Output**: Codex uses all previous context to implement the auth endpoint with full understanding of the API design.
@@ -129,7 +133,7 @@ If you have multiple Codex sessions and want to choose which one to continue:
 
 **Manual Command** (run outside skill):
 ```bash
-codex exec resume --last
+codex exec -m gpt-5.1 resume --last "your prompt"
 ```
 
 This opens an interactive picker showing:
@@ -156,7 +160,7 @@ Select session to resume:
 
 **Skill Executes**:
 ```bash
-codex exec resume --last "Continue the queue implementation"
+codex exec -m gpt-5.1 resume --last "Continue the queue implementation"
 ```
 
 **Result**: Codex resumes the queue session with **full context from Day 1**, even though Claude Code was closed and reopened.
@@ -186,13 +190,13 @@ User makes request
 │
 ├─ Contains continuation keywords?
 │  │
-│  ├─ YES → Use `codex exec resume --last`
+│  ├─ YES → Use `codex exec -m gpt-5.1 resume --last`
 │  │
 │  └─ NO → Check context
 │     │
 │     ├─ References previous Codex work?
 │     │  │
-│     │  ├─ YES → Use `codex exec resume --last`
+│     │  ├─ YES → Use `codex exec -m gpt-5.1 resume --last`
 │     │  │
 │     │  └─ NO → New session: `codex exec -m ... "prompt"`
 │
@@ -216,10 +220,10 @@ User makes request
 ### Accessing History
 ```bash
 # Resume most recent (recommended for skill)
-codex exec resume --last
+codex exec -m gpt-5.1 resume --last "your prompt"
 
 # Interactive picker (manual use)
-codex exec resume --last
+codex exec -m gpt-5.1 resume --last "your prompt"
 
 # List sessions (manual use)
 codex list
@@ -284,7 +288,7 @@ Then subsequent "continue" requests will work.
 
 **Fix**: Use interactive picker to select correct session:
 ```bash
-codex exec resume --last
+codex exec -m gpt-5.1 resume --last "your prompt"
 ```
 
 ---
@@ -295,7 +299,7 @@ codex exec resume --last
 
 **Solution**:
 1. Be explicit: "Resume the queue design session" (skill will use --last)
-2. Or manually: `codex exec resume --last` (or `codex exec resume <session-id>`) → pick correct session
+2. Or manually: `codex exec -m gpt-5.1 resume --last "your prompt"` (or `codex exec resume <session-id>`) → pick correct session
 
 ---
 

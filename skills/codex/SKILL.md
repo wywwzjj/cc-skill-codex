@@ -58,6 +58,8 @@ This skill triggers when:
 ```bash
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
+  -c hide_agent_reasoning=true \
+  -c model_reasoning_summary=concise \
   "<design/review/debug prompt>"
 ```
 
@@ -77,6 +79,8 @@ All Codex invocations use these defaults unless user specifies otherwise:
 | Sandbox (code editing) | `workspace-write` | `-s workspace-write` | Allows file modifications |
 | Reasoning Effort | `high` | `-c model_reasoning_effort=high` | Maximum reasoning capability |
 | Verbosity | `medium` | `-c model_verbosity=medium` | Balanced output detail |
+| Hide Reasoning | `true` | `-c hide_agent_reasoning=true` | **IMPORTANT**: Hide thinking output to reduce context |
+| Reasoning Summary | `concise` | `-c model_reasoning_summary=concise` | Compact reasoning summaries |
 | Web Search | `enabled` | `--enable web_search_request` | Access to up-to-date information |
 
 ### Common Flags
@@ -105,19 +109,32 @@ Detect continuation when user says:
 
 ### How to Resume
 
-Prompt is **required**:
+**⚠️ Important Limitations**:
+- **Concurrent sessions**: `--last` points to globally most recent session. Multiple Claude Code instances may conflict.
+- **Model matching**: Must specify same model used in original session (e.g., `-m gpt-5.1`), otherwise you'll get a warning and degraded performance.
+
+**Basic usage** (single Claude Code instance):
 
 ```bash
-# ✅ Single-line prompt
-codex exec resume --last "Add error handling"
+# ✅ Match original model (-m before resume)
+codex exec -m gpt-5.1 resume --last "Add error handling"
 
-# ✅ Multi-line: use heredoc (see CRITICAL Requirements above)
-codex exec resume --last <<'EOF'
+# ✅ Multi-line with model
+codex exec -m gpt-5.1 resume --last <<'EOF'
 Multi-line prompt here
 EOF
+```
 
-# ❌ WRONG - missing prompt
-codex exec resume --last
+**Advanced usage** (multiple instances - track session ID):
+
+```bash
+# 1. Capture session ID from first invocation
+SESSION_ID=$(codex exec -m gpt-5.1 "initial prompt" 2>&1 | grep -o 'session id: [a-f0-9-]*' | cut -d' ' -f3)
+
+# 2. Resume with explicit session ID and model
+codex exec -m gpt-5.1 resume "$SESSION_ID" <<'EOF'
+Continue prompt
+EOF
 ```
 
 ### New Session vs. Resume
@@ -126,8 +143,8 @@ codex exec resume --last
 |----------|---------|
 | New independent request | `codex exec -m gpt-5.1 "prompt"` |
 | User says "fresh start" | `codex exec -m gpt-5.1 "prompt"` |
-| User says "continue" | `codex exec resume --last "prompt"` |
-| Building on previous work | `codex exec resume --last "prompt"` |
+| User says "continue" | `codex exec -m gpt-5.1 resume --last "prompt"` |
+| Building on previous work | `codex exec -m gpt-5.1 resume --last "prompt"` |
 
 **Sessions auto-save** - no manual tracking needed. See `references/session-workflows.md` for detailed examples and workflows.
 
@@ -152,6 +169,8 @@ See `references/troubleshooting.md` for details.
 ```bash
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
+  -c hide_agent_reasoning=true \
+  -c model_reasoning_summary=concise \
   "Design a REST API for a blog system"
 ```
 
@@ -167,7 +186,7 @@ codex exec -m gpt-5.1 -s read-only \
 
 **Codex executes**:
 ```bash
-codex exec resume --last "Add comprehensive error handling to the API"
+codex exec -m gpt-5.1 resume --last "Add comprehensive error handling to the API"
 ```
 
 **Result**: Builds on previous API design with full context
