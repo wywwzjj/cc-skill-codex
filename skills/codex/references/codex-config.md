@@ -48,7 +48,7 @@ trust_level = "trusted"
 | `model_max_output_tokens` | number | - | Max output tokens |
 | `model_reasoning_effort` | `minimal` \| `low` \| `medium` \| `high` | varies | Responses API reasoning effort |
 | `model_verbosity` | `low` \| `medium` \| `high` | varies | GPT-5 text verbosity (Responses API) |
-| `model_reasoning_summary` | `auto` \| `concise` \| `detailed` \| `none` | `auto` | Reasoning summaries |
+| `model_reasoning_summary` | `auto` \| `concise` \| `detailed` \| `none` | `auto` | Reasoning summaries. **Note**: GPT-5.1 only supports `detailed` and `none`, not `concise`. Use `none` to minimize output. |
 
 ### Execution Control
 
