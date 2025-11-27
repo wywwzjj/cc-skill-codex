@@ -59,7 +59,6 @@ This skill triggers when:
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
-  -c model_reasoning_summary=none \
   -c model_verbosity=low \
   "<design/review/debug prompt>"
 ```
@@ -80,7 +79,6 @@ All Codex invocations use these defaults unless user specifies otherwise:
 | Sandbox (code editing) | `workspace-write` | `-s workspace-write` | Allows file modifications |
 | Reasoning Effort | `high` | `-c model_reasoning_effort=high` | Maximum reasoning capability |
 | Hide Reasoning | `true` | `-c hide_agent_reasoning=true` | **IMPORTANT**: Hide thinking output to reduce context |
-| Reasoning Summary | `none` | `-c model_reasoning_summary=none` | Disable reasoning summaries (GPT-5.1 doesn't support `concise`) |
 | Verbosity | `low` | `-c model_verbosity=low` | Minimize output length |
 | Web Search | `enabled` | `--enable web_search_request` | Access to up-to-date information |
 
@@ -171,7 +169,6 @@ See `references/troubleshooting.md` for details.
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
-  -c model_reasoning_summary=none \
   -c model_verbosity=low \
   "Design a REST API for a blog system"
 ```
