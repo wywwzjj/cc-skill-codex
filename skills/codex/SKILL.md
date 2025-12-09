@@ -116,10 +116,10 @@ Detect continuation when user says:
 
 ```bash
 # ✅ Match original model (-m before resume)
-codex exec -m gpt-5.1 resume --last "Add error handling"
+codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last "Add error handling"
 
 # ✅ Multi-line with model
-codex exec -m gpt-5.1 resume --last <<'EOF'
+codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last <<'EOF'
 Multi-line prompt here
 EOF
 ```
@@ -128,10 +128,10 @@ EOF
 
 ```bash
 # 1. Capture session ID from first invocation
-SESSION_ID=$(codex exec -m gpt-5.1 "initial prompt" 2>&1 | grep -o 'session id: [a-f0-9-]*' | cut -d' ' -f3)
+SESSION_ID=$(codex exec -m gpt-5.1 -c hide_agent_reasoning=true "initial prompt" 2>&1 | grep -o 'session id: [a-f0-9-]*' | cut -d' ' -f3)
 
 # 2. Resume with explicit session ID and model
-codex exec -m gpt-5.1 resume "$SESSION_ID" <<'EOF'
+codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume "$SESSION_ID" <<'EOF'
 Continue prompt
 EOF
 ```
@@ -140,10 +140,10 @@ EOF
 
 | Scenario | Command |
 |----------|---------|
-| New independent request | `codex exec -m gpt-5.1 "prompt"` |
-| User says "fresh start" | `codex exec -m gpt-5.1 "prompt"` |
-| User says "continue" | `codex exec -m gpt-5.1 resume --last "prompt"` |
-| Building on previous work | `codex exec -m gpt-5.1 resume --last "prompt"` |
+| New independent request | `codex exec -m gpt-5.1 -c hide_agent_reasoning=true "prompt"` |
+| User says "fresh start" | `codex exec -m gpt-5.1 -c hide_agent_reasoning=true "prompt"` |
+| User says "continue" | `codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last "prompt"` |
+| Building on previous work | `codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last "prompt"` |
 
 **Sessions auto-save** - no manual tracking needed. See `references/session-workflows.md` for detailed examples and workflows.
 
@@ -151,7 +151,7 @@ EOF
 
 | Error | Fix |
 |-------|-----|
-| No prompt provided | Add prompt: `codex exec resume --last "prompt"` |
+| No prompt provided | Add prompt: `codex exec -c hide_agent_reasoning=true resume --last "prompt"` |
 | Multi-line parsing error | Use heredoc (see CRITICAL Requirements) |
 | stdout is not a terminal | Use `codex exec`, not `codex` |
 | Not authenticated | Run `codex login` |
@@ -185,7 +185,7 @@ codex exec -m gpt-5.1 -s read-only \
 
 **Codex executes**:
 ```bash
-codex exec -m gpt-5.1 resume --last "Add comprehensive error handling to the API"
+codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last "Add comprehensive error handling to the API"
 ```
 
 **Result**: Builds on previous API design with full context

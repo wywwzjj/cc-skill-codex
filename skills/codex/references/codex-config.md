@@ -109,7 +109,7 @@ streamable_shell = true
 
 **CLI usage**:
 ```bash
-codex exec --enable web_search_request "Research latest patterns"
+codex exec --enable web_search_request -c hide_agent_reasoning=true "Research latest patterns"
 ```
 
 ---
@@ -224,7 +224,7 @@ approval_policy = "on-request"
 
 **Usage**:
 ```bash
-codex exec --profile design "Design REST API"
+codex exec --profile design -c hide_agent_reasoning=true "Design REST API"
 ```
 
 **Priority**: Profile settings override root-level settings but are overridden by explicit CLI flags.
@@ -314,7 +314,7 @@ web_search_request = true
 |-----|---------------|-------------|
 | `project_doc_max_bytes` | number | Max bytes to read from AGENTS.md |
 | `profile` | string | Active profile name |
-| `hide_agent_reasoning` | boolean | Hide model reasoning events |
+| `hide_agent_reasoning` | boolean | **IMPORTANT for Claude Code**: Hide model reasoning events to reduce context consumption |
 | `show_raw_agent_reasoning` | boolean | Show raw reasoning (when available) |
 | `model_supports_reasoning_summaries` | boolean | Force-enable reasoning summaries |
 | `model_reasoning_summary_format` | `none` \| `experimental` | Force reasoning summary format |
@@ -339,7 +339,7 @@ From highest to lowest:
 ```bash
 # Profile has model="gpt-5"
 # But CLI flag overrides it
-codex exec --profile myprofile --model gpt-5.1 "prompt"
+codex exec --profile myprofile --model gpt-5.1 -c hide_agent_reasoning=true "prompt"
 # Uses gpt-5.1 (CLI flag wins)
 ```
 
@@ -354,6 +354,9 @@ model_reasoning_effort = "high"
 model_verbosity = "medium"
 sandbox_mode = "read-only"
 approval_policy = "on-request"
+
+# IMPORTANT: Hide reasoning output to reduce Claude's context consumption
+hide_agent_reasoning = true
 
 # Enable useful features
 [features]

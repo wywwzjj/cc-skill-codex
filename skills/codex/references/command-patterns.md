@@ -38,7 +38,9 @@
 ### Command
 ```bash
 # Use heredoc for multi-line prompts
-codex exec -m gpt-5.1 -s read-only -c model_reasoning_effort=high <<'EOF'
+codex exec -m gpt-5.1 -s read-only \
+  -c model_reasoning_effort=high \
+  -c hide_agent_reasoning=true <<'EOF'
 Design a REST API architecture for a blog system. Focus on:
 - Resource modeling
 - Endpoint design
@@ -67,6 +69,7 @@ EOF
 ```bash
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
+  -c hide_agent_reasoning=true \
   "Review this authentication code for:\n\
   - Security vulnerabilities\n\
   - Best practices violations\n\
@@ -94,6 +97,7 @@ codex exec -m gpt-5.1 -s read-only \
 ```bash
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
+  -c hide_agent_reasoning=true \
   "Analyze this queue implementation for deadlock issues:\n\
   - Identify potential race conditions\n\
   - Explain the deadlock scenario\n\
@@ -122,6 +126,7 @@ codex exec -m gpt-5.1 -s read-only \
 ```bash
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
+  -c hide_agent_reasoning=true \
   "Plan a caching layer for this system:\n\
   - Cache strategy (where, what, when)\n\
   - Invalidation approach\n\
@@ -150,6 +155,7 @@ codex exec -m gpt-5.1 -s read-only \
 ```bash
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
+  -c hide_agent_reasoning=true \
   "Design a distributed consensus algorithm for:\n\
   - Network: 5-10 nodes\n\
   - Requirement: Strong consistency\n\
@@ -190,7 +196,7 @@ codex exec -m gpt-5.1 -s read-only \
 ### 1. Always Use read-only Mode
 ```bash
 # ✅ Correct - Codex for thinking, not doing
-codex exec -s read-only "Design the system"
+codex exec -s read-only -c hide_agent_reasoning=true "Design the system"
 
 # ❌ Avoid - Let Claude handle implementation
 codex exec -s workspace-write "Implement the system"

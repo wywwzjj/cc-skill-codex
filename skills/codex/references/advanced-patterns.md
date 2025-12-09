@@ -25,6 +25,7 @@ Need latest information, best practices, or recent developments.
 ```bash
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
+  -c hide_agent_reasoning=true \
   --enable web_search_request \
   "Research latest distributed system patterns for microservices in 2025"
 ```
@@ -37,19 +38,19 @@ codex exec -m gpt-5.1 -s read-only \
 
 ### High Reasoning (Default)
 ```bash
-codex exec -c model_reasoning_effort=high "Complex design problem"
+codex exec -c model_reasoning_effort=high -c hide_agent_reasoning=true "Complex design problem"
 ```
 **Use for**: Complex architecture, algorithm design, security analysis
 
 ### Medium Reasoning
 ```bash
-codex exec -c model_reasoning_effort=medium "Standard review task"
+codex exec -c model_reasoning_effort=medium -c hide_agent_reasoning=true "Standard review task"
 ```
 **Use for**: Standard code reviews, moderate complexity
 
 ### Low Reasoning
 ```bash
-codex exec -c model_reasoning_effort=low "Quick sanity check"
+codex exec -c model_reasoning_effort=low -c hide_agent_reasoning=true "Quick sanity check"
 ```
 **Use for**: Quick syntax checks, simple questions
 
@@ -61,19 +62,19 @@ codex exec -c model_reasoning_effort=low "Quick sanity check"
 
 ### High Verbosity
 ```bash
-codex exec -c model_verbosity=high "Explain this algorithm in detail"
+codex exec -c model_verbosity=high -c hide_agent_reasoning=true "Explain this algorithm in detail"
 ```
 **Output**: Comprehensive, detailed explanations
 
 ### Medium Verbosity (Default)
 ```bash
-codex exec -c model_verbosity=medium "Review this code"
+codex exec -c model_verbosity=medium -c hide_agent_reasoning=true "Review this code"
 ```
 **Output**: Balanced detail
 
 ### Low Verbosity
 ```bash
-codex exec -c model_verbosity=low "Quick code review"
+codex exec -c model_verbosity=low -c hide_agent_reasoning=true "Quick code review"
 ```
 **Output**: Concise, focused feedback
 
@@ -83,7 +84,7 @@ codex exec -c model_verbosity=low "Quick code review"
 
 ### Change Working Directory
 ```bash
-codex exec -C ./backend "Review the API architecture in this directory"
+codex exec -C ./backend -c hide_agent_reasoning=true "Review the API architecture in this directory"
 ```
 
 **Use when**: Working with specific subdirectories
@@ -97,6 +98,7 @@ codex exec -C ./backend "Review the API architecture in this directory"
 codex exec -m gpt-5.1 -s read-only \
   -c model_reasoning_effort=high \
   -c model_verbosity=high \
+  -c hide_agent_reasoning=true \
   --enable web_search_request \
   -C ./backend \
   "Research latest authentication patterns (2025) and design an auth system for this project"
@@ -116,6 +118,7 @@ codex exec -m gpt-5.1 -s read-only \
 |------|--------|----------|
 | `-c model_reasoning_effort` | `high/medium/low` | Complexity of reasoning |
 | `-c model_verbosity` | `high/medium/low` | Detail level in output |
+| `-c hide_agent_reasoning` | `true` | **IMPORTANT**: Hide thinking output to reduce context |
 | `--enable web_search_request` | flag | Need latest information |
 | `-C <dir>` | directory path | Work in specific directory |
 
