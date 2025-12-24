@@ -1,6 +1,6 @@
 # cc-skill-codex
 
-A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI integration with GPT-5.1 high-reasoning capabilities.
+A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI integration with GPT-5.2 high-reasoning capabilities.
 
 **Philosophy**: Codex = Brain (thinking), Claude = Hands (implementation)
 
@@ -94,7 +94,7 @@ After installation, verify the skill is working:
 > Use Codex to design a binary search tree in Rust
 ```
 
-The skill will invoke Codex CLI with GPT-5.1 high-reasoning capabilities.
+The skill will invoke Codex CLI with GPT-5.2 high-reasoning capabilities.
 
 ---
 

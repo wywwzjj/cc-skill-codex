@@ -1,6 +1,6 @@
 ---
 name: codex
-description: Invoke Codex CLI for high-reasoning tasks requiring GPT-5.1 capabilities. Use when user mentions "Codex", requests design/architecture, code review, debug analysis, or algorithm design. Codex = Brain (thinking), Claude = Hands (implementation). Supports session continuation for long-term projects.
+description: Invoke Codex CLI for high-reasoning tasks requiring GPT-5.2 capabilities. Use when user mentions "Codex", requests design/architecture, code review, debug analysis, or algorithm design. Codex = Brain (thinking), Claude = Hands (implementation). Supports session continuation for long-term projects.
 ---
 
 # cc-skill-codex: Codex CLI Integration for Claude Code
@@ -47,7 +47,7 @@ Then use Claude to implement what Codex designed.
 
 This skill triggers when:
 - User explicitly mentions "Codex" or "Use Codex"
-- User requests "GPT-5.1" capabilities
+- User requests "GPT-5.2" capabilities
 - User wants to continue a previous Codex session
 
 ## How It Works

@@ -17,7 +17,7 @@
 - Refactoring
 - Feature implementation
 
-**Why this works**: Codex (GPT-5.1) excels at deep reasoning, while Claude Code's integration makes implementation seamless.
+**Why this works**: Codex (GPT-5.2) excels at deep reasoning, while Claude Code's integration makes implementation seamless.
 
 ---
 
