@@ -10,7 +10,7 @@
 
 ```toml
 # Primary settings
-model = "gpt-5.1"  # For reasoning, not implementation
+model = "gpt-5.2"  # For reasoning, not implementation
 model_reasoning_effort = "high"  # Maximum reasoning capability
 sandbox_mode = "read-only"  # Default: analyze but don't modify files
 
@@ -29,7 +29,7 @@ trust_level = "trusted"
 ```
 
 **Why these settings?**
-- `gpt-5.1`: Best for design, review, debug analysis
+- `gpt-5.2`: Best for design, review, debug analysis
 - `read-only`: Codex analyzes, Claude implements
 - `high` reasoning: Maximize thinking quality
 - Web search: Access latest information and best practices
@@ -42,11 +42,11 @@ trust_level = "trusted"
 
 | Key | Type / Values | Default | Notes |
 |-----|---------------|---------|-------|
-| `model` | string | varies | Model to use (e.g., `gpt-5.1`, `gpt-5.1-codex`) |
+| `model` | string | varies | Model to use (e.g., `gpt-5.2`, `gpt-5.2-codex`) |
 | `model_provider` | string | `openai` | Provider id from model_providers |
 | `model_context_window` | number | - | Context window tokens |
 | `model_max_output_tokens` | number | - | Max output tokens |
-| `model_reasoning_effort` | `minimal` \| `low` \| `medium` \| `high` | varies | Responses API reasoning effort |
+| `model_reasoning_effort` | `minimal` \| `low` \| `medium` \| `high` \| `xhigh` | varies | Responses API reasoning effort |
 | `model_verbosity` | `low` \| `medium` \| `high` | varies | GPT-5 text verbosity (Responses API) |
 | `model_reasoning_summary` | `auto` \| `concise` \| `detailed` | `auto` | Reasoning summaries. Use default `auto` for GPT-5.1 compatibility. |
 
@@ -212,12 +212,12 @@ Create reusable configuration profiles for different use cases.
 
 ```toml
 [profiles.design]
-model = "gpt-5.1"
+model = "gpt-5.2"
 sandbox_mode = "read-only"
 model_reasoning_effort = "high"
 
 [profiles.implement]
-model = "gpt-5.1-codex"
+model = "gpt-5.2-codex"
 sandbox_mode = "workspace-write"
 approval_policy = "on-request"
 ```
@@ -330,7 +330,7 @@ web_search_request = true
 
 From highest to lowest:
 
-1. **Explicit CLI flags**: `--model gpt-5.1`, `--enable feature`
+1. **Explicit CLI flags**: `--model gpt-5.2`, `--enable feature`
 2. **Profile settings**: `--profile design`
 3. **Root-level config**: Settings in `config.toml`
 4. **Built-in defaults**: CLI's default values
@@ -339,8 +339,8 @@ From highest to lowest:
 ```bash
 # Profile has model="gpt-5"
 # But CLI flag overrides it
-codex exec --profile myprofile --model gpt-5.1 -c hide_agent_reasoning=true "prompt"
-# Uses gpt-5.1 (CLI flag wins)
+codex exec --profile myprofile --model gpt-5.2 -c hide_agent_reasoning=true "prompt"
+# Uses gpt-5.2 (CLI flag wins)
 ```
 
 ---
@@ -349,7 +349,7 @@ codex exec --profile myprofile --model gpt-5.1 -c hide_agent_reasoning=true "pro
 
 ```toml
 # Recommended for Claude Code: Codex as thinking assistant
-model = "gpt-5.1"
+model = "gpt-5.2"
 model_reasoning_effort = "high"
 model_verbosity = "medium"
 sandbox_mode = "read-only"
@@ -379,12 +379,12 @@ url = "https://mcp.deepwiki.com/mcp"
 
 # Profiles for different use cases
 [profiles.design]
-model = "gpt-5.1"
+model = "gpt-5.2"
 sandbox_mode = "read-only"
 model_reasoning_effort = "high"
 
 [profiles.review]
-model = "gpt-5.1"
+model = "gpt-5.2"
 sandbox_mode = "read-only"
 model_verbosity = "high"
 
@@ -408,7 +408,7 @@ notify = ["python3", "/path/to/notify.py"]
 ## Quick Tips
 
 ### For Claude Code Integration
-- Use `gpt-5.1` (not `gpt-5.1-codex`) for reasoning tasks
+- Use `gpt-5.2` (not `gpt-5.2-codex`) for reasoning tasks
 - Default to `read-only` sandbox - let Claude do the coding
 - Enable `web_search_request` for latest information
 - Use profiles to switch between design/review/implementation modes

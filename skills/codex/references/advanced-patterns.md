@@ -23,7 +23,7 @@ Need latest information, best practices, or recent developments.
 
 ### Example: Research Latest Patterns
 ```bash
-codex exec -m gpt-5.1 -s read-only \
+codex exec -m gpt-5.2 -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
   --enable web_search_request \
@@ -35,6 +35,12 @@ codex exec -m gpt-5.1 -s read-only \
 ---
 
 ## Reasoning Control
+
+### XHigh Reasoning (Maximum)
+```bash
+codex exec -c model_reasoning_effort=xhigh -c hide_agent_reasoning=true "Extremely complex problem"
+```
+**Use for**: Most complex architecture, deep algorithm design, thorough security analysis
 
 ### High Reasoning (Default)
 ```bash
@@ -54,7 +60,13 @@ codex exec -c model_reasoning_effort=low -c hide_agent_reasoning=true "Quick san
 ```
 **Use for**: Quick syntax checks, simple questions
 
-**Default is high** - only lower if you need faster responses for simple tasks.
+### Minimal Reasoning
+```bash
+codex exec -c model_reasoning_effort=minimal -c hide_agent_reasoning=true "Simple task"
+```
+**Use for**: Very simple tasks, fastest response
+
+**Default is high** - adjust based on task complexity.
 
 ---
 
@@ -95,7 +107,7 @@ codex exec -C ./backend -c hide_agent_reasoning=true "Review the API architectur
 
 ### Research + Design
 ```bash
-codex exec -m gpt-5.1 -s read-only \
+codex exec -m gpt-5.2 -s read-only \
   -c model_reasoning_effort=high \
   -c model_verbosity=high \
   -c hide_agent_reasoning=true \
@@ -116,10 +128,10 @@ codex exec -m gpt-5.1 -s read-only \
 
 | Flag | Values | Use Case |
 |------|--------|----------|
-| `-c model_reasoning_effort` | `high/medium/low` | Complexity of reasoning |
+| `-c model_reasoning_effort` | `xhigh/high/medium/low/minimal` | Complexity of reasoning |
 | `-c model_verbosity` | `high/medium/low` | Detail level in output |
 | `-c hide_agent_reasoning` | `true` | **IMPORTANT**: Hide thinking output to reduce context |
-| `--enable web_search_request` | flag | Need latest information |
+| `--search` | flag | Enable web search |
 | `-C <dir>` | directory path | Work in specific directory |
 
 ---

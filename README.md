@@ -31,7 +31,7 @@ cc-skill-codex/                  # Plugin root
             ├── session-workflows.md     # Session continuation patterns
             ├── troubleshooting.md       # Error solutions and debugging
             ├── codex-config.md          # Complete configuration reference
-            ├── codex-help.md            # Codex CLI v0.58 help reference
+            ├── codex-help.md            # Codex CLI v0.77 help reference
             └── advanced-patterns.md     # Advanced options
 ```
 
@@ -50,7 +50,7 @@ cc-skill-codex/                  # Plugin root
 
 1. **Codex CLI** installed and authenticated:
    ```bash
-   codex --version  # v0.58+
+   codex --version  # v0.77+
    codex login
    ```
 
@@ -104,7 +104,7 @@ The skill will invoke Codex CLI with GPT-5.1 high-reasoning capabilities.
 
 ```bash
 # Check if Codex CLI is installed
-codex --version  # Requires v0.58+
+codex --version  # Requires v0.77+
 
 # If not installed, follow OpenAI's installation instructions
 # https://developers.openai.com/codex/cli/installation
@@ -163,7 +163,7 @@ Select "Manage Plugins" to see cc-skill-codex in your list.
 ```
 
 Codex will:
-1. Execute: `codex exec -m gpt-5.1 -s read-only -c model_reasoning_effort=high -c hide_agent_reasoning=true "Design a REST API..."`
+1. Execute: `codex exec -m gpt-5.2 -s read-only -c model_reasoning_effort=high -c hide_agent_reasoning=true "Design a REST API..."`
 2. Provide high-level architecture, endpoint design, data models
 3. Session auto-saved for continuation
 
@@ -199,7 +199,7 @@ Codex will:
 ```
 
 Codex will:
-1. Execute: `codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last "Add comprehensive error handling to the API"`
+1. Execute: `codex exec -m gpt-5.2 -c hide_agent_reasoning=true resume --last "Add comprehensive error handling to the API"`
 2. Resume with full context from previous session
 3. Build on previous design decisions
 
@@ -236,8 +236,8 @@ Codex will:
 - **Best practice**: Be explicit about what you want Codex to do
 
 ### Model Usage
-- **gpt-5.1** (default): General reasoning, architecture design, code review
-- **gpt-5.1-codex**: Code editing tasks (rare - usually let Claude implement)
+- **gpt-5.2** (default): General reasoning, architecture design, code review
+- **gpt-5.2-codex**: Code editing tasks (rare - usually let Claude implement)
 - **Default reasoning**: High reasoning effort for maximum quality
 
 ### Session Continuation
@@ -269,5 +269,5 @@ For detailed information, see:
 
 **License**: Apache 2.0
 **Version**: 2.0.0
-**Codex CLI**: v0.58+
+**Codex CLI**: v0.77+
 **Philosophy**: Codex = Brain (thinking), Claude = Hands (implementation)

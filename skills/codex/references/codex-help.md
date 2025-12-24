@@ -1,6 +1,6 @@
 # Codex CLI Help Reference
 
-**Version**: 0.58.0
+**Version**: 0.77.0
 
 ## Main Command: `codex --help`
 
@@ -14,6 +14,7 @@ Usage: codex [OPTIONS] [PROMPT]
 
 Commands:
   exec        Run Codex non-interactively [aliases: e]
+  review      Run a code review non-interactively
   login       Manage login
   logout      Remove stored authentication credentials
   mcp         [experimental] Run Codex as an MCP server and manage MCP servers
@@ -56,7 +57,11 @@ Options:
 
       --oss
           Convenience flag to select the local open source model provider. Equivalent to -c
-          model_provider=oss; verifies a local Ollama server is running
+          model_provider=oss; verifies a local LM Studio or Ollama server is running
+
+      --local-provider <OSS_PROVIDER>
+          Specify which local provider to use (lmstudio or ollama). If not specified with --oss,
+          will use config default or show selection
 
   -p, --profile <CONFIG_PROFILE>
           Configuration profile from config.toml to specify default options
@@ -114,6 +119,7 @@ Usage: codex exec [OPTIONS] [PROMPT] [COMMAND]
 
 Commands:
   resume  Resume a previous session by id or pick the most recent with --last
+  review  Run a code review against the current repository
   help    Print this message or the help of the given subcommand(s)
 
 Arguments:
@@ -133,17 +139,21 @@ Options:
       --enable <FEATURE>
           Enable a feature (repeatable). Equivalent to `-c features.<name>=true`
 
-  -i, --image <FILE>...
-          Optional image(s) to attach to the initial prompt
-
       --disable <FEATURE>
           Disable a feature (repeatable). Equivalent to `-c features.<name>=false`
+
+  -i, --image <FILE>...
+          Optional image(s) to attach to the initial prompt
 
   -m, --model <MODEL>
           Model the agent should use
 
       --oss
+          Use open-source provider
 
+      --local-provider <OSS_PROVIDER>
+          Specify which local provider to use (lmstudio or ollama). If not specified with --oss,
+          will use config default or show selection
 
   -s, --sandbox <SANDBOX_MODE>
           Select the sandbox policy to use when executing model-generated shell commands
@@ -166,6 +176,9 @@ Options:
 
       --skip-git-repo-check
           Allow running Codex outside a Git repository
+
+      --add-dir <DIR>
+          Additional directories that should be writable alongside the primary workspace
 
       --output-schema <FILE>
           Path to a JSON Schema file describing the model's final response shape
@@ -228,4 +241,25 @@ Options:
 
   -h, --help
           Print help (see a summary with '-h')
+```
+
+## Features Command: `codex features list`
+
+```
+undo                            stable          true
+parallel                        stable          true
+view_image_tool                 stable          true
+shell_tool                      stable          true
+warnings                        stable          true
+web_search_request              stable          true
+unified_exec                    beta            false
+shell_snapshot                  beta            false
+apply_patch_freeform            experimental    false
+exec_policy                     experimental    true
+experimental_windows_sandbox    experimental    false
+elevated_windows_sandbox        experimental    false
+remote_compaction               experimental    true
+remote_models                   experimental    false
+skills                          experimental    true
+tui2                            experimental    false
 ```

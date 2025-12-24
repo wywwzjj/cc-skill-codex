@@ -16,7 +16,7 @@ Error: No prompt provided. Either specify one as an argument or pipe the prompt 
 **Solutions**:
 ```bash
 # ✅ Solution 1: Direct prompt argument
-codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last "your prompt here"
+codex exec -m gpt-5.2 -c hide_agent_reasoning=true resume --last "your prompt here"
 
 # ❌ WRONG - will always fail (no prompt)
 codex exec resume --last
@@ -35,29 +35,29 @@ codex exec resume --last
 **Solution**:
 ```bash
 # ✅ Use heredoc (NO trailing -)
-codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last <<'EOF'
+codex exec -m gpt-5.2 -c hide_agent_reasoning=true resume --last <<'EOF'
 Multi-line prompt here
 EOF
 
 # ❌ WRONG - Don't add - after --last
-codex exec -m gpt-5.1 resume --last -
+codex exec -m gpt-5.2 resume --last -
 ```
 
 ---
 
 ### Error 1.6: Model Mismatch Warning on Resume
 
-**Warning**: `This session was recorded with model 'gpt-5.1' but is resuming with 'gpt-5.1-codex'`
+**Warning**: `This session was recorded with model 'gpt-5.2' but is resuming with 'gpt-5.2-codex'`
 
 **Cause**: Not specifying model when resuming, causing Codex to use default model instead of original session's model.
 
 **Solution**:
 ```bash
 # ✅ Always specify model matching original session (-m before resume)
-codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last "continue"
+codex exec -m gpt-5.2 -c hide_agent_reasoning=true resume --last "continue"
 
 # Or with explicit session ID
-codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume "$SESSION_ID" "continue"
+codex exec -m gpt-5.2 -c hide_agent_reasoning=true resume "$SESSION_ID" "continue"
 ```
 
 ---
@@ -73,10 +73,10 @@ codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume "$SESSION_ID" "continu
 **Option 1**: Track session ID explicitly
 ```bash
 # Capture session ID from first call
-SESSION_ID=$(codex exec -m gpt-5.1 -c hide_agent_reasoning=true "prompt" 2>&1 | grep -o 'session id: [a-f0-9-]*' | cut -d' ' -f3)
+SESSION_ID=$(codex exec -m gpt-5.2 -c hide_agent_reasoning=true "prompt" 2>&1 | grep -o 'session id: [a-f0-9-]*' | cut -d' ' -f3)
 
 # Resume with specific session ID and model (-m before resume)
-codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume "$SESSION_ID" <<'EOF'
+codex exec -m gpt-5.2 -c hide_agent_reasoning=true resume "$SESSION_ID" <<'EOF'
 Continue prompt
 EOF
 ```
@@ -99,12 +99,12 @@ Error: stdout is not a terminal
 **Solution**:
 ```bash
 # ❌ WRONG - interactive mode fails in Claude Code
-codex -m gpt-5.1 "prompt"
+codex -m gpt-5.2 "prompt"
 codex resume --last "prompt"
 
 # ✅ CORRECT - use codex exec
-codex exec -m gpt-5.1 -c hide_agent_reasoning=true "prompt"
-codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last "prompt"
+codex exec -m gpt-5.2 -c hide_agent_reasoning=true "prompt"
+codex exec -m gpt-5.2 -c hide_agent_reasoning=true resume --last "prompt"
 ```
 
 **Why**: Claude Code's bash environment is non-TTY (non-interactive). Only `codex exec` works in this environment.
@@ -177,8 +177,8 @@ Error: Invalid model specified
 **Solution**:
 ```bash
 # ✅ Use supported models
-codex exec -m gpt-5.1 -c hide_agent_reasoning=true "prompt"           # General reasoning
-codex exec -m gpt-5.1-codex -c hide_agent_reasoning=true "prompt"     # Code editing
+codex exec -m gpt-5.2 -c hide_agent_reasoning=true "prompt"           # General reasoning
+codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true "prompt"     # Code editing
 
 # ❌ Common mistakes
 codex exec -m gpt-5 "prompt"             # Wrong version
@@ -186,8 +186,9 @@ codex exec -m codex "prompt"             # Wrong name
 ```
 
 **Valid models**:
-- `gpt-5.1` - General reasoning, architecture design
-- `gpt-5.1-codex` - Code editing tasks
+- `gpt-5.2` - General reasoning, architecture design
+- `gpt-5.2-codex` - Code editing tasks
+- `gpt-5.1-codex-max` - Flagship Codex model
 
 ---
 
@@ -231,12 +232,12 @@ Error: No previous sessions found
 
 1. **Start a new session first**:
 ```bash
-codex exec -m gpt-5.1 -c hide_agent_reasoning=true "Your initial prompt"
+codex exec -m gpt-5.2 -c hide_agent_reasoning=true "Your initial prompt"
 ```
 
 2. **Then resume in subsequent requests**:
 ```bash
-codex exec -m gpt-5.1 -c hide_agent_reasoning=true resume --last "Continue with..."
+codex exec -m gpt-5.2 -c hide_agent_reasoning=true resume --last "Continue with..."
 ```
 
 **Note**: Sessions only exist after you've run at least one `codex exec` command.
@@ -287,10 +288,10 @@ cat ~/.codex/config.toml
 2. **Common TOML mistakes**:
 ```toml
 # ❌ WRONG - missing quotes
-model = gpt-5.1
+model = gpt-5.2
 
 # ✅ CORRECT - strings need quotes
-model = "gpt-5.1"
+model = "gpt-5.2"
 
 # ❌ WRONG - incorrect array syntax
 [features]
@@ -308,7 +309,7 @@ mv ~/.codex/config.toml ~/.codex/config.toml.backup
 
 # Create new minimal config
 cat > ~/.codex/config.toml << 'EOF'
-model = "gpt-5.1"
+model = "gpt-5.2"
 sandbox_mode = "read-only"
 
 [features]
@@ -510,14 +511,14 @@ codex auth status
 
 If you've tried the above and still have issues:
 
-1. **Check Codex version**: `codex --version` (ensure you have v0.58+)
+1. **Check Codex version**: `codex --version` (ensure you have v0.77+)
 2. **Review logs**: Check `~/.codex/logs/` if available
 3. **Minimal reproduction**: Try simplest possible command:
    ```bash
-   codex exec -m gpt-5.1 -c hide_agent_reasoning=true "Hello"
+   codex exec -m gpt-5.2 -c hide_agent_reasoning=true "Hello"
    ```
 4. **Configuration reset**: Temporarily rename config to test with defaults:
    ```bash
    mv ~/.codex/config.toml ~/.codex/config.toml.backup
-   codex exec -m gpt-5.1 -c hide_agent_reasoning=true "test"
+   codex exec -m gpt-5.2 -c hide_agent_reasoning=true "test"
    ```
