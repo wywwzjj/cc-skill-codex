@@ -23,7 +23,7 @@ Need latest information, best practices, or recent developments.
 
 ### Example: Research Latest Patterns
 ```bash
-codex exec -m gpt-5.2 -s read-only \
+codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
   --enable web_search_request \
@@ -107,7 +107,7 @@ codex exec -C ./backend -c hide_agent_reasoning=true "Review the API architectur
 
 ### Research + Design
 ```bash
-codex exec -m gpt-5.2 -s read-only \
+codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c model_verbosity=high \
   -c hide_agent_reasoning=true \
@@ -131,8 +131,9 @@ codex exec -m gpt-5.2 -s read-only \
 | `-c model_reasoning_effort` | `xhigh/high/medium/low/minimal` | Complexity of reasoning |
 | `-c model_verbosity` | `high/medium/low` | Detail level in output |
 | `-c hide_agent_reasoning` | `true` | **IMPORTANT**: Hide thinking output to reduce context |
-| `--search` | flag | Enable web search |
 | `-C <dir>` | directory path | Work in specific directory |
+
+> **Note**: `--search` flag is only available for interactive `codex` mode, NOT for `codex exec`.
 
 ---
 

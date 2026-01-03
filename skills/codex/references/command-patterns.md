@@ -38,7 +38,7 @@
 ### Command
 ```bash
 # Use heredoc for multi-line prompts
-codex exec -m gpt-5.2 -s read-only \
+codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true <<'EOF'
 Design a REST API architecture for a blog system. Focus on:
@@ -67,7 +67,7 @@ EOF
 
 ### Command
 ```bash
-codex exec -m gpt-5.2 -s read-only \
+codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
   "Review this authentication code for:\n\
@@ -95,7 +95,7 @@ codex exec -m gpt-5.2 -s read-only \
 
 ### Command
 ```bash
-codex exec -m gpt-5.2 -s read-only \
+codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
   "Analyze this queue implementation for deadlock issues:\n\
@@ -124,7 +124,7 @@ codex exec -m gpt-5.2 -s read-only \
 
 ### Command
 ```bash
-codex exec -m gpt-5.2 -s read-only \
+codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
   "Plan a caching layer for this system:\n\
@@ -153,7 +153,7 @@ codex exec -m gpt-5.2 -s read-only \
 
 ### Command
 ```bash
-codex exec -m gpt-5.2 -s read-only \
+codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
   "Design a distributed consensus algorithm for:\n\

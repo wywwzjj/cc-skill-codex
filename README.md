@@ -163,7 +163,7 @@ Select "Manage Plugins" to see cc-skill-codex in your list.
 ```
 
 Codex will:
-1. Execute: `codex exec -m gpt-5.2 -s read-only -c model_reasoning_effort=high -c hide_agent_reasoning=true "Design a REST API..."`
+1. Execute: `codex exec -m gpt-5.2-codex -s read-only -c model_reasoning_effort=high -c hide_agent_reasoning=true "Design a REST API..."`
 2. Provide high-level architecture, endpoint design, data models
 3. Session auto-saved for continuation
 
@@ -199,7 +199,7 @@ Codex will:
 ```
 
 Codex will:
-1. Execute: `codex exec -m gpt-5.2 -c hide_agent_reasoning=true resume --last "Add comprehensive error handling to the API"`
+1. Execute: `codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "Add comprehensive error handling to the API"`
 2. Resume with full context from previous session
 3. Build on previous design decisions
 
