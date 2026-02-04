@@ -38,7 +38,6 @@ Unlike Claude's conversation context (which resets when you close Claude Code), 
 codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
-  -c model_verbosity=low \
   "Help me design a queue data structure in Python"
 ```
 
@@ -77,7 +76,6 @@ EOF
 codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
-  -c model_verbosity=low \
   "Design a REST API for a blog system"
 ```
 

@@ -5,6 +5,8 @@ description: Invoke Codex CLI for high-reasoning tasks requiring GPT-5.2 capabil
 
 # cc-skill-codex: Codex CLI Integration for Claude Code
 
+**Codex CLI Version**: v0.95.0+
+
 ---
 
 ## ⚠️ CRITICAL Requirements
@@ -59,7 +61,6 @@ This skill triggers when:
 codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
-  -c model_verbosity=low \
   "<design/review/debug prompt>"
 ```
 
@@ -79,28 +80,41 @@ All Codex invocations use these defaults unless user specifies otherwise:
 | Sandbox (code editing) | `workspace-write` | `-s workspace-write` | Allows file modifications |
 | Reasoning Effort | `high` | `-c model_reasoning_effort=high` | Maximum reasoning capability |
 | Hide Reasoning | `true` | `-c hide_agent_reasoning=true` | **IMPORTANT**: Hide thinking output to reduce context |
-| Verbosity | `low` | `-c model_verbosity=low` | Minimize output length |
-| Web Search | `disabled` | `-c features.web_search_request=true` | Only for `codex exec` (see note below) |
+
+**Note on defaults**: `web_search_request`, `view_image_tool`, `parallel_shell` are enabled by default - no CLI flag needed. Use `--disable <feature>` only if you need to turn them off.
 
 ### Available Models
 
-| Model | Description | Best For |
-|-------|-------------|----------|
-| `gpt-5.2` | Latest frontier model | General reasoning, architecture |
-| `gpt-5.2-codex` | Codex-optimized | Code editing, implementation |
-| `gpt-5.1-codex-max` | Flagship Codex model | Deep reasoning + code |
+| Model | Description |
+|-------|-------------|
+| `gpt-5.2-codex` | Latest frontier agentic coding model (recommended) |
+| `gpt-5.2` | Latest frontier model with improvements across knowledge, reasoning and coding |
 
 ### Common Flags
 
-- `-m`: Model (`gpt-5.2`, `gpt-5.2-codex`, `gpt-5.1-codex-max`)
+- `-m`: Model (`gpt-5.2-codex`, `gpt-5.2`)
 - `-s`: Sandbox (`read-only`, `workspace-write`, `danger-full-access`)
 - `-c`: Config (e.g., `model_reasoning_effort=high`)
 - `-i`: Attach images
+- `-p`: Profile (load config profile from `~/.codex/config.toml`)
 - `--full-auto`: workspace-write + on-request approval
-
-**Note**: `--search` is only available for interactive `codex` mode, NOT for `codex exec`.
+- `--skip-git-repo-check`: Allow running outside Git repository
+- `--output-schema`: Specify JSON Schema for structured output
 
 See `references/codex-help.md` for complete flag list.
+
+### Code Review Command
+
+For code review tasks, use the dedicated `codex review` command (non-interactive):
+
+```bash
+codex review --uncommitted              # Review staged, unstaged, and untracked changes
+codex review --base main                # Review changes against main branch
+codex review --commit HEAD~3            # Review changes introduced by a specific commit
+codex review "Check for security issues"  # Custom review instructions
+```
+
+**When to use**: User asks to review code changes, PR review, or security audit of recent commits.
 
 ## Session Continuation
 
@@ -176,7 +190,6 @@ See `references/troubleshooting.md` for details.
 codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
-  -c model_verbosity=low \
   "Design a REST API for a blog system"
 ```
 

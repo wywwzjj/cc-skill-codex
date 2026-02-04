@@ -1,5 +1,7 @@
 # Troubleshooting Guide
 
+**Codex CLI Version**: v0.95.0+
+
 ---
 
 ## Common Errors
@@ -186,9 +188,8 @@ codex exec -m codex "prompt"             # Wrong name
 ```
 
 **Valid models**:
-- `gpt-5.2` - General reasoning, architecture design
-- `gpt-5.2-codex` - Code editing tasks
-- `gpt-5.1-codex-max` - Flagship Codex model
+- `gpt-5.2-codex` - Agentic coding model (recommended)
+- `gpt-5.2` - General reasoning (base model)
 
 ---
 
@@ -291,10 +292,10 @@ cat ~/.codex/config.toml
 2. **Common TOML mistakes**:
 ```toml
 # ❌ WRONG - missing quotes
-model = gpt-5.2
+model = gpt-5.2-codex
 
 # ✅ CORRECT - strings need quotes
-model = "gpt-5.2"
+model = "gpt-5.2-codex"
 
 # ❌ WRONG - incorrect array syntax
 [features]
@@ -312,7 +313,7 @@ mv ~/.codex/config.toml ~/.codex/config.toml.backup
 
 # Create new minimal config
 cat > ~/.codex/config.toml << 'EOF'
-model = "gpt-5.2"
+model = "gpt-5.2-codex"
 sandbox_mode = "read-only"
 
 [features]
@@ -425,12 +426,7 @@ codex exec -c model_reasoning_effort=medium -c hide_agent_reasoning=true "simple
 codex exec -c model_reasoning_effort=low -c hide_agent_reasoning=true "quick check"
 ```
 
-2. **Reduce verbosity**:
-```bash
-codex exec -c model_verbosity=low -c hide_agent_reasoning=true "concise task"
-```
-
-3. **Check network connectivity**:
+2. **Check network connectivity**:
 ```bash
 ping api.openai.com
 ```
@@ -514,7 +510,7 @@ codex auth status
 
 If you've tried the above and still have issues:
 
-1. **Check Codex version**: `codex --version` (ensure you have v0.77+)
+1. **Check Codex version**: `codex --version` (ensure you have v0.95+)
 2. **Review logs**: Check `~/.codex/logs/` if available
 3. **Minimal reproduction**: Try simplest possible command:
    ```bash

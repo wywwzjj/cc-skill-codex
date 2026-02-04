@@ -8,7 +8,7 @@
 
 **Read this only if you need:**
 - Web search for latest info
-- Custom reasoning/verbosity levels
+- Custom reasoning levels
 - Working directory control
 - Specific config overrides
 
@@ -70,28 +70,6 @@ codex exec -c model_reasoning_effort=minimal -c hide_agent_reasoning=true "Simpl
 
 ---
 
-## Verbosity Control
-
-### High Verbosity
-```bash
-codex exec -c model_verbosity=high -c hide_agent_reasoning=true "Explain this algorithm in detail"
-```
-**Output**: Comprehensive, detailed explanations
-
-### Medium Verbosity (Default)
-```bash
-codex exec -c model_verbosity=medium -c hide_agent_reasoning=true "Review this code"
-```
-**Output**: Balanced detail
-
-### Low Verbosity
-```bash
-codex exec -c model_verbosity=low -c hide_agent_reasoning=true "Quick code review"
-```
-**Output**: Concise, focused feedback
-
----
-
 ## Working Directory
 
 ### Change Working Directory
@@ -109,7 +87,6 @@ codex exec -C ./backend -c hide_agent_reasoning=true "Review the API architectur
 ```bash
 codex exec -m gpt-5.2-codex -s read-only \
   -c model_reasoning_effort=high \
-  -c model_verbosity=high \
   -c hide_agent_reasoning=true \
   --enable web_search_request \
   -C ./backend \
@@ -119,7 +96,6 @@ codex exec -m gpt-5.2-codex -s read-only \
 **This combines**:
 - Web search for latest info
 - High reasoning for design
-- High verbosity for detailed output
 - Specific working directory
 
 ---
@@ -129,7 +105,6 @@ codex exec -m gpt-5.2-codex -s read-only \
 | Flag | Values | Use Case |
 |------|--------|----------|
 | `-c model_reasoning_effort` | `xhigh/high/medium/low/minimal` | Complexity of reasoning |
-| `-c model_verbosity` | `high/medium/low` | Detail level in output |
 | `-c hide_agent_reasoning` | `true` | **IMPORTANT**: Hide thinking output to reduce context |
 | `-C <dir>` | directory path | Work in specific directory |
 

@@ -1,6 +1,6 @@
 # Codex CLI Help Reference
 
-**Version**: 0.77.0
+**Version**: 0.95.0
 
 ## Main Command: `codex --help`
 
@@ -20,12 +20,14 @@ Commands:
   mcp         [experimental] Run Codex as an MCP server and manage MCP servers
   mcp-server  [experimental] Run the Codex MCP server (stdio transport)
   app-server  [experimental] Run the app server or related tooling
+  app         Launch the Codex macOS app (auto-downloads DMG if needed)
   completion  Generate shell completion scripts
   sandbox     Run commands within a Codex-provided sandbox [aliases: debug]
   apply       Apply the latest diff produced by Codex agent as a `git apply` to your local working
               tree [aliases: a]
   resume      Resume a previous interactive session (picker by default; use --last to continue the
               most recent)
+  fork        Fork a previous interactive session
   cloud       [EXPERIMENTAL] Browse tasks from Codex Cloud and apply changes locally
   features    Inspect feature flags
   help        Print this message or the help of the given subcommand(s)
@@ -260,6 +262,20 @@ experimental_windows_sandbox    experimental    false
 elevated_windows_sandbox        experimental    false
 remote_compaction               experimental    true
 remote_models                   experimental    false
-skills                          experimental    true
+skills                          stable          true
 tui2                            experimental    false
+plan_mode                       stable          true
+personality                     stable          true
+cloud_tasks                     experimental    true
+parallel_shell                  stable          true
+```
+
+## Code Review Command: `codex review`
+
+Run code review non-interactively (useful for Claude to invoke):
+```bash
+codex review --uncommitted              # Review staged, unstaged, and untracked changes
+codex review --base main                # Review changes against main branch
+codex review --commit HEAD~3            # Review changes introduced by a specific commit
+codex review "Check for security issues"  # Custom review instructions
 ```

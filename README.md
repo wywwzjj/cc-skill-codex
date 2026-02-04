@@ -4,6 +4,8 @@ A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI int
 
 **Philosophy**: Codex = Brain (thinking), Claude = Hands (implementation)
 
+**Codex CLI Version**: v0.95.0+
+
 ## What is this?
 
 **cc-skill-codex** is a Claude Code **plugin** that contains the **codex skill**. When you install this plugin, you get access to the skill that enables Codex CLI integration.
@@ -31,7 +33,7 @@ cc-skill-codex/                  # Plugin root
             ├── session-workflows.md     # Session continuation patterns
             ├── troubleshooting.md       # Error solutions and debugging
             ├── codex-config.md          # Complete configuration reference
-            ├── codex-help.md            # Codex CLI v0.77 help reference
+            ├── codex-help.md            # Codex CLI v0.95 help reference
             └── advanced-patterns.md     # Advanced options
 ```
 
@@ -50,7 +52,7 @@ cc-skill-codex/                  # Plugin root
 
 1. **Codex CLI** installed and authenticated:
    ```bash
-   codex --version  # v0.77+
+   codex --version  # v0.95+
    codex login
    ```
 
@@ -104,7 +106,7 @@ The skill will invoke Codex CLI with GPT-5.2 high-reasoning capabilities.
 
 ```bash
 # Check if Codex CLI is installed
-codex --version  # Requires v0.77+
+codex --version  # Requires v0.95+
 
 # If not installed, follow OpenAI's installation instructions
 # https://developers.openai.com/codex/cli/installation
@@ -268,6 +270,6 @@ For detailed information, see:
 ---
 
 **License**: Apache 2.0
-**Version**: 2.0.0
-**Codex CLI**: v0.77+
+**Version**: 2.1.0
+**Codex CLI**: v0.95+
 **Philosophy**: Codex = Brain (thinking), Claude = Hands (implementation)

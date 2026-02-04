@@ -1,6 +1,7 @@
 # Codex Configuration Reference
 
 **Config file location**: `~/.codex/config.toml`
+**Codex CLI Version**: v0.95.0+
 
 ---
 
@@ -10,7 +11,7 @@
 
 ```toml
 # Primary settings
-model = "gpt-5.2"  # For reasoning, not implementation
+model = "gpt-5.2-codex"  # Agentic coding model (recommended)
 model_reasoning_effort = "high"  # Maximum reasoning capability
 sandbox_mode = "read-only"  # Default: analyze but don't modify files
 
@@ -29,7 +30,7 @@ trust_level = "trusted"
 ```
 
 **Why these settings?**
-- `gpt-5.2`: Best for design, review, debug analysis
+- `gpt-5.2-codex`: Best for agentic coding tasks (design, review, debug)
 - `read-only`: Codex analyzes, Claude implements
 - `high` reasoning: Maximize thinking quality
 - Web search: Access latest information and best practices
@@ -47,8 +48,8 @@ trust_level = "trusted"
 | `model_context_window` | number | - | Context window tokens |
 | `model_max_output_tokens` | number | - | Max output tokens |
 | `model_reasoning_effort` | `minimal` \| `low` \| `medium` \| `high` \| `xhigh` | varies | Responses API reasoning effort |
-| `model_verbosity` | `low` \| `medium` \| `high` | varies | GPT-5 text verbosity (Responses API) |
-| `model_reasoning_summary` | `auto` \| `concise` \| `detailed` | `auto` | Reasoning summaries. Use default `auto` for GPT-5.1 compatibility. |
+| `model_verbosity` | `low` \| `medium` \| `high` | varies | GPT-5 text verbosity (base models only, not `-codex` models) |
+| `model_reasoning_summary` | `auto` \| `concise` \| `detailed` | `auto` | Reasoning summaries format |
 
 ### Execution Control
 
@@ -95,16 +96,34 @@ Features can be enabled/disabled in config or via CLI flags:
 
 | Feature | Default | Stability | Description |
 |---------|---------|-----------|-------------|
-| `unified_exec` | false | Experimental | PTY-backed unified execution tool |
-| `streamable_shell` | false | Experimental | Streamable command execution tool pair |
+| `undo` | true | Stable | Undo capability |
+| `parallel` | true | Stable | Parallel execution |
 | `view_image_tool` | true | Stable | Allow Codex to view local image files |
-| `web_search_request` | false | Stable | Allow model to initiate web searches |
+| `shell_tool` | true | Stable | Shell command execution |
+| `warnings` | true | Stable | Display warnings |
+| `web_search_request` | true | Stable | Allow model to initiate web searches |
+| `skills` | true | Stable | Personal skills from `~/.agents/skills` |
+| `plan_mode` | true | Stable | Plan mode with `/plan` command |
+| `personality` | true | Stable | Personality configuration (default: friendly) |
+| `parallel_shell` | true | Stable | Shell tools can run in parallel |
+| `exec_policy` | true | Experimental | Execution policy control |
+| `cloud_tasks` | true | Experimental | Cloud task management |
+| `remote_compaction` | true | Experimental | Remote context compaction |
+| `unified_exec` | false | Beta | PTY-backed unified execution tool |
+| `shell_snapshot` | false | Beta | Shell snapshot support |
+| `apply_patch_freeform` | false | Experimental | Freeform patch application |
+| `remote_models` | false | Experimental | Remote model support |
+| `tui2` | false | Experimental | New TUI interface |
+| `experimental_windows_sandbox` | false | Experimental | Windows sandbox support |
+| `elevated_windows_sandbox` | false | Experimental | Elevated Windows sandbox |
+
+**Note**: Most useful features are enabled by default. Use `--disable <feature>` only when needed.
 
 **Example**:
 ```toml
 [features]
 web_search_request = true
-streamable_shell = true
+shell_snapshot = true
 ```
 
 **CLI usage**:
@@ -212,7 +231,7 @@ Create reusable configuration profiles for different use cases.
 
 ```toml
 [profiles.design]
-model = "gpt-5.2"
+model = "gpt-5.2-codex"
 sandbox_mode = "read-only"
 model_reasoning_effort = "high"
 
@@ -330,17 +349,17 @@ web_search_request = true
 
 From highest to lowest:
 
-1. **Explicit CLI flags**: `--model gpt-5.2`, `--enable feature`
+1. **Explicit CLI flags**: `--model gpt-5.2-codex`, `--enable feature`
 2. **Profile settings**: `--profile design`
 3. **Root-level config**: Settings in `config.toml`
 4. **Built-in defaults**: CLI's default values
 
 **Example**:
 ```bash
-# Profile has model="gpt-5"
+# Profile has model="gpt-5.2"
 # But CLI flag overrides it
-codex exec --profile myprofile --model gpt-5.2 -c hide_agent_reasoning=true "prompt"
-# Uses gpt-5.2 (CLI flag wins)
+codex exec --profile myprofile --model gpt-5.2-codex -c hide_agent_reasoning=true "prompt"
+# Uses gpt-5.2-codex (CLI flag wins)
 ```
 
 ---
@@ -349,9 +368,8 @@ codex exec --profile myprofile --model gpt-5.2 -c hide_agent_reasoning=true "pro
 
 ```toml
 # Recommended for Claude Code: Codex as thinking assistant
-model = "gpt-5.2"
+model = "gpt-5.2-codex"
 model_reasoning_effort = "high"
-model_verbosity = "medium"
 sandbox_mode = "read-only"
 approval_policy = "on-request"
 
@@ -379,14 +397,14 @@ url = "https://mcp.deepwiki.com/mcp"
 
 # Profiles for different use cases
 [profiles.design]
-model = "gpt-5.2"
+model = "gpt-5.2-codex"
 sandbox_mode = "read-only"
 model_reasoning_effort = "high"
 
 [profiles.review]
-model = "gpt-5.2"
+model = "gpt-5.2-codex"
 sandbox_mode = "read-only"
-model_verbosity = "high"
+model_reasoning_effort = "high"
 
 # Trust your projects
 [projects."/Users/YOU/my-project"]
@@ -408,14 +426,13 @@ notify = ["python3", "/path/to/notify.py"]
 ## Quick Tips
 
 ### For Claude Code Integration
-- Use `gpt-5.2` (not `gpt-5.2-codex`) for reasoning tasks
+- Use `gpt-5.2-codex` for agentic coding tasks (recommended)
 - Default to `read-only` sandbox - let Claude do the coding
 - Enable `web_search_request` for latest information
 - Use profiles to switch between design/review/implementation modes
 
 ### For Performance
 - Lower `model_reasoning_effort` for simple tasks
-- Adjust `model_verbosity` based on how much detail you need
 - Use `sandbox_mode = "read-only"` for faster approval-free execution
 
 ### For Security
