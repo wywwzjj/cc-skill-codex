@@ -1,6 +1,6 @@
 # Codex CLI Help Reference
 
-**Version**: 0.95.0
+**Version**: 0.101.0
 
 ## Main Command: `codex --help`
 
@@ -20,14 +20,16 @@ Commands:
   mcp         [experimental] Run Codex as an MCP server and manage MCP servers
   mcp-server  [experimental] Run the Codex MCP server (stdio transport)
   app-server  [experimental] Run the app server or related tooling
-  app         Launch the Codex macOS app (auto-downloads DMG if needed)
+  app         Launch the Codex desktop app (downloads the macOS installer if missing)
   completion  Generate shell completion scripts
-  sandbox     Run commands within a Codex-provided sandbox [aliases: debug]
+  sandbox     Run commands within a Codex-provided sandbox
+  debug       Debugging tools
   apply       Apply the latest diff produced by Codex agent as a `git apply` to your local working
               tree [aliases: a]
   resume      Resume a previous interactive session (picker by default; use --last to continue the
               most recent)
-  fork        Fork a previous interactive session
+  fork        Fork a previous interactive session (picker by default; use --last to fork the most
+              recent)
   cloud       [EXPERIMENTAL] Browse tasks from Codex Cloud and apply changes locally
   features    Inspect feature flags
   help        Print this message or the help of the given subcommand(s)
@@ -83,9 +85,6 @@ Options:
           - on-failure: Run all commands without asking for user approval. Only asks for approval if
             a command fails to execute, in which case it will escalate to the user to ask for
             un-sandboxed execution
-          - on-request: The model decides when to ask the user for approval
-          - never:      Never ask for user approval Execution failures are immediately returned to
-            the model
 
       --full-auto
           Convenience alias for low-friction sandboxed automatic execution (-a on-request, --sandbox
@@ -97,10 +96,6 @@ Options:
 
   -C, --cd <DIR>
           Tell the agent to use the specified directory as its working root
-
-      --search
-          Enable web search (off by default). When enabled, the native Responses `web_search` tool
-          is available to the model (no per‑call approval)
 
       --add-dir <DIR>
           Additional directories that should be writable alongside the primary workspace
@@ -182,6 +177,9 @@ Options:
       --add-dir <DIR>
           Additional directories that should be writable alongside the primary workspace
 
+      --ephemeral
+          Run without persisting session files to disk
+
       --output-schema <FILE>
           Path to a JSON Schema file describing the model's final response shape
 
@@ -206,7 +204,7 @@ Options:
 
 ## Exec Resume Command: `codex exec resume --help`
 
-**⚠️ IMPORTANT**: Despite `[PROMPT]` appearing optional in syntax, a prompt is **required** in practice.
+**Important**: Despite `[PROMPT]` appearing optional in syntax, a prompt is **required** in practice.
 Omitting it will error: "No prompt provided."
 
 ```
@@ -216,8 +214,8 @@ Usage: codex exec resume [OPTIONS] [SESSION_ID] [PROMPT]
 
 Arguments:
   [SESSION_ID]
-          Conversation/session id (UUID). When provided, resumes this session. If omitted, use
-          --last to pick the most recent recorded session
+          Conversation/session id (UUID) or thread name. UUIDs take precedence if it parses. If
+          omitted, use --last to pick the most recent recorded session
 
   [PROMPT]
           Prompt to send after resuming the session. If `-` is used, read from stdin
@@ -235,11 +233,37 @@ Options:
       --last
           Resume the most recent recorded session (newest) without specifying an id
 
+      --all
+          Show all sessions (disables cwd filtering)
+
       --enable <FEATURE>
           Enable a feature (repeatable). Equivalent to `-c features.<name>=true`
 
       --disable <FEATURE>
           Disable a feature (repeatable). Equivalent to `-c features.<name>=false`
+
+  -i, --image <FILE>
+          Optional image(s) to attach to the prompt sent after resuming
+
+  -m, --model <MODEL>
+          Model the agent should use
+
+      --full-auto
+          Convenience alias for low-friction sandboxed automatic execution (-a on-request, --sandbox
+          workspace-write)
+
+      --dangerously-bypass-approvals-and-sandbox
+          Skip all confirmation prompts and execute commands without sandboxing. EXTREMELY
+          DANGEROUS. Intended solely for running in environments that are externally sandboxed
+
+      --skip-git-repo-check
+          Allow running Codex outside a Git repository
+
+      --ephemeral
+          Run without persisting session files to disk
+
+      --json
+          Print events to stdout as JSONL
 
   -h, --help
           Print help (see a summary with '-h')
@@ -248,26 +272,35 @@ Options:
 ## Features Command: `codex features list`
 
 ```
-undo                            stable          true
-parallel                        stable          true
-view_image_tool                 stable          true
-shell_tool                      stable          true
-warnings                        stable          true
-web_search_request              stable          true
-unified_exec                    beta            false
-shell_snapshot                  beta            false
-apply_patch_freeform            experimental    false
-exec_policy                     experimental    true
-experimental_windows_sandbox    experimental    false
-elevated_windows_sandbox        experimental    false
-remote_compaction               experimental    true
-remote_models                   experimental    false
-skills                          stable          true
-tui2                            experimental    false
-plan_mode                       stable          true
-personality                     stable          true
-cloud_tasks                     experimental    true
-parallel_shell                  stable          true
+undo                             stable             false
+shell_tool                       stable             true
+unified_exec                     stable             true
+shell_snapshot                   stable             true
+js_repl                          under development  false
+web_search_request               deprecated         false
+web_search_cached                deprecated         false
+search_tool                      removed            false
+runtime_metrics                  under development  false
+sqlite                           under development  false
+memory_tool                      under development  false
+child_agents_md                  under development  false
+apply_patch_freeform             under development  false
+use_linux_sandbox_bwrap          under development  false
+request_rule                     stable             true
+experimental_windows_sandbox     removed            false
+elevated_windows_sandbox         removed            false
+remote_models                    stable             true
+powershell_utf8                  under development  false
+enable_request_compression       stable             true
+collab                           experimental       true
+apps                             experimental       false
+skill_mcp_dependency_install     stable             true
+skill_env_var_dependency_prompt  under development  false
+steer                            stable             true
+collaboration_modes              stable             true
+personality                      stable             true
+responses_websockets             under development  false
+responses_websockets_v2          under development  false
 ```
 
 ## Code Review Command: `codex review`
@@ -278,4 +311,5 @@ codex review --uncommitted              # Review staged, unstaged, and untracked
 codex review --base main                # Review changes against main branch
 codex review --commit HEAD~3            # Review changes introduced by a specific commit
 codex review "Check for security issues"  # Custom review instructions
+codex review --title "feat: add auth"   # Optional commit title in review summary
 ```

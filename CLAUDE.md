@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is **cc-skill-codex**, a Claude Code plugin that integrates OpenAI's Codex CLI (v0.95.0+) with GPT-5.2 capabilities. The core philosophy is **Codex = Brain (thinking), Claude = Hands (implementation)**.
+This is **cc-skill-codex**, a Claude Code plugin that integrates OpenAI's Codex CLI (v0.101.0+) with GPT-5.3 capabilities. The core philosophy is **Codex = Brain (thinking), Claude = Hands (implementation)**.
 
 ## Architecture
 
@@ -50,7 +50,7 @@ codex exec resume --last -
 ### Session resume requires model flag before `resume`
 ```bash
 # Correct - model before resume
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "prompt"
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "prompt"
 
 # Incorrect - model mismatch warning
 codex exec resume --last "prompt"  # Uses default model, not original session's model
@@ -58,7 +58,7 @@ codex exec resume --last "prompt"  # Uses default model, not original session's 
 
 ### Default command structure
 ```bash
-codex exec -m gpt-5.2-codex -s read-only \
+codex exec -m gpt-5.3-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
   "prompt"
@@ -69,15 +69,14 @@ codex exec -m gpt-5.2-codex -s read-only \
 1. User adds marketplace: `/plugin marketplace add wywwzjj/cc-skill-codex`
 2. User installs plugin: `/plugin install cc-skill-codex@cc-skill-codex-marketplace`
 3. Claude Code loads `skills/codex/SKILL.md` when skill is invoked
-4. Skill triggers on: "Codex" keyword, "GPT-5.2" mention, or session continuation phrases
+4. Skill triggers on: "Codex" keyword, "GPT-5.3" mention, or session continuation phrases
 
 ## Available Models
 
 | Model | Use Case |
 |-------|----------|
-| `gpt-5.2` | General reasoning, architecture |
-| `gpt-5.2-codex` | Code editing (recommended default) |
-| `gpt-5.1-codex-max` | Deep reasoning + code |
+| `gpt-5.3` | General reasoning, architecture |
+| `gpt-5.3-codex` | Code editing (recommended default) |
 
 ## Sandbox Modes
 

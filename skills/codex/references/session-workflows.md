@@ -35,7 +35,7 @@ Unlike Claude's conversation context (which resets when you close Claude Code), 
 
 **Skill Executes**:
 ```bash
-codex exec -m gpt-5.2-codex -s read-only \
+codex exec -m gpt-5.3-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
   "Help me design a queue data structure in Python"
@@ -54,12 +54,12 @@ codex exec -m gpt-5.2-codex -s read-only \
 
 **Skill Executes** (using heredoc for multi-line prompt):
 ```bash
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last <<'EOF'
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last <<'EOF'
 Add thread-safety to the queue. Please ensure it handles concurrent access properly and includes proper locking mechanisms.
 EOF
 ```
 
-**Note**: Always specify the model (before `resume`) to match original session model. For single-line: `codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "prompt"`
+**Note**: Always specify the model (before `resume`) to match original session model. For single-line: `codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "prompt"`
 
 **Codex Response**: Resumes previous session, maintains context about the queue design, and adds thread-safety implementation building on the previous discussion.
 
@@ -73,7 +73,7 @@ EOF
 **User**: "Design a REST API for a blog system"
 
 ```bash
-codex exec -m gpt-5.2-codex -s read-only \
+codex exec -m gpt-5.3-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
   "Design a REST API for a blog system"
@@ -88,7 +88,7 @@ codex exec -m gpt-5.2-codex -s read-only \
 
 **Skill Executes**:
 ```bash
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "Add authentication to the API"
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "Add authentication to the API"
 ```
 
 **Output**: Codex continues from previous API design and adds JWT/OAuth authentication strategy.
@@ -100,7 +100,7 @@ codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "Add auth
 
 **Skill Executes**:
 ```bash
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "Add comprehensive error handling"
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "Add comprehensive error handling"
 ```
 
 **Output**: Codex builds on previous API + auth design and adds error handling patterns.
@@ -112,7 +112,7 @@ codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "Add comp
 
 **Skill Executes**:
 ```bash
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "Implement the user authentication endpoint"
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "Implement the user authentication endpoint"
 ```
 
 **Output**: Codex uses all previous context to implement the auth endpoint with full understanding of the API design.
@@ -131,7 +131,7 @@ If you have multiple Codex sessions and want to choose which one to continue:
 
 **Manual Command** (run outside skill):
 ```bash
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "your prompt"
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "your prompt"
 ```
 
 This opens an interactive picker showing:
@@ -158,7 +158,7 @@ Select session to resume:
 
 **Skill Executes**:
 ```bash
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "Continue the queue implementation"
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "Continue the queue implementation"
 ```
 
 **Result**: Codex resumes the queue session with **full context from Day 1**, even though Claude Code was closed and reopened.
@@ -188,13 +188,13 @@ User makes request
 │
 ├─ Contains continuation keywords?
 │  │
-│  ├─ YES → Use `codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last`
+│  ├─ YES → Use `codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last`
 │  │
 │  └─ NO → Check context
 │     │
 │     ├─ References previous Codex work?
 │     │  │
-│     │  ├─ YES → Use `codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last`
+│     │  ├─ YES → Use `codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last`
 │     │  │
 │     │  └─ NO → New session: `codex exec -m ... -c hide_agent_reasoning=true "prompt"`
 │
@@ -218,10 +218,10 @@ User makes request
 ### Accessing History
 ```bash
 # Resume most recent (recommended for skill)
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "your prompt"
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "your prompt"
 
 # Interactive picker (manual use)
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "your prompt"
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "your prompt"
 
 # List sessions (manual use)
 codex list
@@ -269,7 +269,7 @@ This allows Codex to provide increasingly sophisticated, context-aware assistanc
 
 **Fix**: Start a new session first:
 ```bash
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true "Design a queue"
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true "Design a queue"
 ```
 
 Then subsequent "continue" requests will work.
@@ -286,7 +286,7 @@ Then subsequent "continue" requests will work.
 
 **Fix**: Use interactive picker to select correct session:
 ```bash
-codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "your prompt"
+codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "your prompt"
 ```
 
 ---
@@ -297,7 +297,7 @@ codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "your pro
 
 **Solution**:
 1. Be explicit: "Resume the queue design session" (skill will use --last)
-2. Or manually: `codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "your prompt"` (or `codex exec -c hide_agent_reasoning=true resume <session-id>`) → pick correct session
+2. Or manually: `codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "your prompt"` (or `codex exec -c hide_agent_reasoning=true resume <session-id>`) → pick correct session
 
 ---
 

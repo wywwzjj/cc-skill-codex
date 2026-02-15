@@ -18,19 +18,7 @@
 
 ## Web Search Integration
 
-### When to Use
-Need latest information, best practices, or recent developments.
-
-### Example: Research Latest Patterns
-```bash
-codex exec -m gpt-5.2-codex -s read-only \
-  -c model_reasoning_effort=high \
-  -c hide_agent_reasoning=true \
-  --enable web_search_request \
-  "Research latest distributed system patterns for microservices in 2025"
-```
-
-**Use for**: Architecture research, security best practices, tech comparisons
+**Note**: As of v0.101.0, `web_search_request` is **deprecated**. Web search capabilities may be handled differently in newer versions.
 
 ---
 
@@ -83,18 +71,16 @@ codex exec -C ./backend -c hide_agent_reasoning=true "Review the API architectur
 
 ## Combined Example
 
-### Research + Design
+### Design with Directory Context
 ```bash
-codex exec -m gpt-5.2-codex -s read-only \
+codex exec -m gpt-5.3-codex -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
-  --enable web_search_request \
   -C ./backend \
-  "Research latest authentication patterns (2025) and design an auth system for this project"
+  "Analyze the current authentication patterns and design an improved auth system for this project"
 ```
 
 **This combines**:
-- Web search for latest info
 - High reasoning for design
 - Specific working directory
 
@@ -108,7 +94,7 @@ codex exec -m gpt-5.2-codex -s read-only \
 | `-c hide_agent_reasoning` | `true` | **IMPORTANT**: Hide thinking output to reduce context |
 | `-C <dir>` | directory path | Work in specific directory |
 
-> **Note**: `--search` flag is only available for interactive `codex` mode, NOT for `codex exec`.
+> **Note**: The `--search` flag has been removed as of v0.101.0. `web_search_request` is deprecated.
 
 ---
 

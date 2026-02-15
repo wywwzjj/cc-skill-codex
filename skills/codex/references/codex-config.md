@@ -1,7 +1,7 @@
 # Codex Configuration Reference
 
 **Config file location**: `~/.codex/config.toml`
-**Codex CLI Version**: v0.95.0+
+**Codex CLI Version**: v0.101.0+
 
 ---
 
@@ -11,14 +11,9 @@
 
 ```toml
 # Primary settings
-model = "gpt-5.2-codex"  # Agentic coding model (recommended)
+model = "gpt-5.3-codex"  # Agentic coding model (recommended)
 model_reasoning_effort = "high"  # Maximum reasoning capability
 sandbox_mode = "read-only"  # Default: analyze but don't modify files
-
-# Enable useful features
-[features]
-web_search_request = true  # Get latest information
-view_image_tool = true  # Analyze images (default: true)
 
 # Optional: MCP server integration
 [mcp_servers.deepwiki]
@@ -30,10 +25,9 @@ trust_level = "trusted"
 ```
 
 **Why these settings?**
-- `gpt-5.2-codex`: Best for agentic coding tasks (design, review, debug)
+- `gpt-5.3-codex`: Best for agentic coding tasks (design, review, debug)
 - `read-only`: Codex analyzes, Claude implements
 - `high` reasoning: Maximize thinking quality
-- Web search: Access latest information and best practices
 
 ---
 
@@ -43,7 +37,7 @@ trust_level = "trusted"
 
 | Key | Type / Values | Default | Notes |
 |-----|---------------|---------|-------|
-| `model` | string | varies | Model to use (e.g., `gpt-5.2`, `gpt-5.2-codex`) |
+| `model` | string | varies | Model to use (e.g., `gpt-5.3`, `gpt-5.3-codex`) |
 | `model_provider` | string | `openai` | Provider id from model_providers |
 | `model_context_window` | number | - | Context window tokens |
 | `model_max_output_tokens` | number | - | Max output tokens |
@@ -55,14 +49,12 @@ trust_level = "trusted"
 
 | Key | Type / Values | Default | Notes |
 |-----|---------------|---------|-------|
-| `approval_policy` | `untrusted` \| `on-failure` \| `on-request` \| `never` | - | When to prompt for approval |
+| `approval_policy` | `untrusted` \| `on-failure` | - | When to prompt for approval |
 | `sandbox_mode` | `read-only` \| `workspace-write` \| `danger-full-access` | `read-only` | OS sandbox policy |
 
 **Approval policies**:
 - `untrusted`: Only run trusted commands (ls, cat, sed) without asking
 - `on-failure`: Run all commands, only ask if one fails
-- `on-request`: Model decides when to ask
-- `never`: Never ask, execution failures returned to model
 
 ### Sandbox Configuration
 
@@ -96,28 +88,27 @@ Features can be enabled/disabled in config or via CLI flags:
 
 | Feature | Default | Stability | Description |
 |---------|---------|-----------|-------------|
-| `undo` | true | Stable | Undo capability |
-| `parallel` | true | Stable | Parallel execution |
-| `view_image_tool` | true | Stable | Allow Codex to view local image files |
 | `shell_tool` | true | Stable | Shell command execution |
-| `warnings` | true | Stable | Display warnings |
-| `web_search_request` | true | Stable | Allow model to initiate web searches |
-| `skills` | true | Stable | Personal skills from `~/.agents/skills` |
-| `plan_mode` | true | Stable | Plan mode with `/plan` command |
+| `unified_exec` | true | Stable | PTY-backed unified execution tool |
+| `shell_snapshot` | true | Stable | Shell snapshot support |
+| `request_rule` | true | Stable | Request rule processing |
+| `remote_models` | true | Stable | Remote model support |
+| `enable_request_compression` | true | Stable | Request compression |
+| `skill_mcp_dependency_install` | true | Stable | Auto-install MCP skill dependencies |
+| `steer` | true | Stable | Steering capabilities |
+| `collaboration_modes` | true | Stable | Collaboration mode support |
 | `personality` | true | Stable | Personality configuration (default: friendly) |
-| `parallel_shell` | true | Stable | Shell tools can run in parallel |
-| `exec_policy` | true | Experimental | Execution policy control |
-| `cloud_tasks` | true | Experimental | Cloud task management |
-| `remote_compaction` | true | Experimental | Remote context compaction |
-| `unified_exec` | false | Beta | PTY-backed unified execution tool |
-| `shell_snapshot` | false | Beta | Shell snapshot support |
-| `apply_patch_freeform` | false | Experimental | Freeform patch application |
-| `remote_models` | false | Experimental | Remote model support |
-| `tui2` | false | Experimental | New TUI interface |
-| `experimental_windows_sandbox` | false | Experimental | Windows sandbox support |
-| `elevated_windows_sandbox` | false | Experimental | Elevated Windows sandbox |
+| `collab` | true | Experimental | Collaboration features |
+| `undo` | false | Stable | Undo capability |
+| `web_search_request` | false | **Deprecated** | Web search (deprecated) |
+| `web_search_cached` | false | **Deprecated** | Cached web search (deprecated) |
+| `apps` | false | Experimental | Apps support |
+| `js_repl` | false | Under Development | JavaScript REPL |
+| `sqlite` | false | Under Development | SQLite support |
+| `memory_tool` | false | Under Development | Memory tool |
+| `apply_patch_freeform` | false | Under Development | Freeform patch application |
 
-**Note**: Most useful features are enabled by default. Use `--disable <feature>` only when needed.
+**Note**: Most useful features are enabled by default. `web_search_request` is now deprecated. Use `--disable <feature>` only when needed.
 
 **Example**:
 ```toml
@@ -231,12 +222,12 @@ Create reusable configuration profiles for different use cases.
 
 ```toml
 [profiles.design]
-model = "gpt-5.2-codex"
+model = "gpt-5.3-codex"
 sandbox_mode = "read-only"
 model_reasoning_effort = "high"
 
 [profiles.implement]
-model = "gpt-5.2-codex"
+model = "gpt-5.3-codex"
 sandbox_mode = "workspace-write"
 approval_policy = "on-request"
 ```
@@ -349,17 +340,17 @@ web_search_request = true
 
 From highest to lowest:
 
-1. **Explicit CLI flags**: `--model gpt-5.2-codex`, `--enable feature`
+1. **Explicit CLI flags**: `--model gpt-5.3-codex`, `--enable feature`
 2. **Profile settings**: `--profile design`
 3. **Root-level config**: Settings in `config.toml`
 4. **Built-in defaults**: CLI's default values
 
 **Example**:
 ```bash
-# Profile has model="gpt-5.2"
+# Profile has model="gpt-5.3"
 # But CLI flag overrides it
-codex exec --profile myprofile --model gpt-5.2-codex -c hide_agent_reasoning=true "prompt"
-# Uses gpt-5.2-codex (CLI flag wins)
+codex exec --profile myprofile --model gpt-5.3-codex -c hide_agent_reasoning=true "prompt"
+# Uses gpt-5.3-codex (CLI flag wins)
 ```
 
 ---
@@ -368,18 +359,13 @@ codex exec --profile myprofile --model gpt-5.2-codex -c hide_agent_reasoning=tru
 
 ```toml
 # Recommended for Claude Code: Codex as thinking assistant
-model = "gpt-5.2-codex"
+model = "gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
-approval_policy = "on-request"
+approval_policy = "on-failure"
 
 # IMPORTANT: Hide reasoning output to reduce Claude's context consumption
 hide_agent_reasoning = true
-
-# Enable useful features
-[features]
-web_search_request = true
-view_image_tool = true
 
 # Shell environment
 [shell_environment_policy]
@@ -397,12 +383,12 @@ url = "https://mcp.deepwiki.com/mcp"
 
 # Profiles for different use cases
 [profiles.design]
-model = "gpt-5.2-codex"
+model = "gpt-5.3-codex"
 sandbox_mode = "read-only"
 model_reasoning_effort = "high"
 
 [profiles.review]
-model = "gpt-5.2-codex"
+model = "gpt-5.3-codex"
 sandbox_mode = "read-only"
 model_reasoning_effort = "high"
 
@@ -426,9 +412,8 @@ notify = ["python3", "/path/to/notify.py"]
 ## Quick Tips
 
 ### For Claude Code Integration
-- Use `gpt-5.2-codex` for agentic coding tasks (recommended)
+- Use `gpt-5.3-codex` for agentic coding tasks (recommended)
 - Default to `read-only` sandbox - let Claude do the coding
-- Enable `web_search_request` for latest information
 - Use profiles to switch between design/review/implementation modes
 
 ### For Performance

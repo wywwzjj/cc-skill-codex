@@ -7,7 +7,7 @@
     {
       "name": "cc-skill-codex",
       "source": "./",
-      "description": "Invoke Codex CLI for high-reasoning tasks with GPT-5.2 capabilities. Codex = Brain (design, review, debug analysis), Claude = Hands (implementation). Supports session continuation with persistent context."
+      "description": "Invoke Codex CLI for high-reasoning tasks with GPT-5.3 capabilities. Codex = Brain (design, review, debug analysis), Claude = Hands (implementation). Supports session continuation with persistent context."
     }
   ]
 }

@@ -1,10 +1,10 @@
 # cc-skill-codex
 
-A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI integration with GPT-5.2 high-reasoning capabilities.
+A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI integration with GPT-5.3 high-reasoning capabilities.
 
 **Philosophy**: Codex = Brain (thinking), Claude = Hands (implementation)
 
-**Codex CLI Version**: v0.95.0+
+**Codex CLI Version**: v0.101.0+
 
 ## What is this?
 
@@ -33,7 +33,7 @@ cc-skill-codex/                  # Plugin root
             ├── session-workflows.md     # Session continuation patterns
             ├── troubleshooting.md       # Error solutions and debugging
             ├── codex-config.md          # Complete configuration reference
-            ├── codex-help.md            # Codex CLI v0.95 help reference
+            ├── codex-help.md            # Codex CLI v0.101 help reference
             └── advanced-patterns.md     # Advanced options
 ```
 
@@ -52,7 +52,7 @@ cc-skill-codex/                  # Plugin root
 
 1. **Codex CLI** installed and authenticated:
    ```bash
-   codex --version  # v0.95+
+   codex --version  # v0.101+
    codex login
    ```
 
@@ -96,7 +96,7 @@ After installation, verify the skill is working:
 > Use Codex to design a binary search tree in Rust
 ```
 
-The skill will invoke Codex CLI with GPT-5.2 high-reasoning capabilities.
+The skill will invoke Codex CLI with GPT-5.3 high-reasoning capabilities.
 
 ---
 
@@ -106,7 +106,7 @@ The skill will invoke Codex CLI with GPT-5.2 high-reasoning capabilities.
 
 ```bash
 # Check if Codex CLI is installed
-codex --version  # Requires v0.95+
+codex --version  # Requires v0.101+
 
 # If not installed, follow OpenAI's installation instructions
 # https://developers.openai.com/codex/cli/installation
@@ -165,7 +165,7 @@ Select "Manage Plugins" to see cc-skill-codex in your list.
 ```
 
 Codex will:
-1. Execute: `codex exec -m gpt-5.2-codex -s read-only -c model_reasoning_effort=high -c hide_agent_reasoning=true "Design a REST API..."`
+1. Execute: `codex exec -m gpt-5.3-codex -s read-only -c model_reasoning_effort=high -c hide_agent_reasoning=true "Design a REST API..."`
 2. Provide high-level architecture, endpoint design, data models
 3. Session auto-saved for continuation
 
@@ -201,7 +201,7 @@ Codex will:
 ```
 
 Codex will:
-1. Execute: `codex exec -m gpt-5.2-codex -c hide_agent_reasoning=true resume --last "Add comprehensive error handling to the API"`
+1. Execute: `codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "Add comprehensive error handling to the API"`
 2. Resume with full context from previous session
 3. Build on previous design decisions
 
@@ -238,8 +238,8 @@ Codex will:
 - **Best practice**: Be explicit about what you want Codex to do
 
 ### Model Usage
-- **gpt-5.2** (default): General reasoning, architecture design, code review
-- **gpt-5.2-codex**: Code editing tasks (rare - usually let Claude implement)
+- **gpt-5.3** (default): General reasoning, architecture design, code review
+- **gpt-5.3-codex**: Code editing tasks (rare - usually let Claude implement)
 - **Default reasoning**: High reasoning effort for maximum quality
 
 ### Session Continuation
@@ -270,6 +270,6 @@ For detailed information, see:
 ---
 
 **License**: Apache 2.0
-**Version**: 2.1.0
-**Codex CLI**: v0.95+
+**Version**: 3.0.0
+**Codex CLI**: v0.101+
 **Philosophy**: Codex = Brain (thinking), Claude = Hands (implementation)
