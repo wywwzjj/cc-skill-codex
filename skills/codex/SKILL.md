@@ -7,7 +7,7 @@ description: Invoke Codex CLI (gpt-5.3-codex model) for high-reasoning tasks. Us
 
 ## Critical Rules
 
-1. **Always use `codex exec`** — `codex` (interactive) fails in Claude Code. Exception: `codex review` is already non-interactive
+1. **Always use `codex exec`** — `codex` (interactive) fails in Claude Code
 2. **Always add `-c hide_agent_reasoning=true`** — hides thinking output to reduce context consumption
 3. **Multi-line prompts must use heredoc** — never use unescaped newlines in quotes, never add `-` after `--last`
 
@@ -21,15 +21,6 @@ codex exec -m gpt-5.3-codex -s read-only \
 ```
 
 Default to **read-only** — Codex thinks, Claude implements. Use `-s workspace-write` only when user explicitly asks Codex to modify files.
-
-## Code Review
-
-```bash
-codex review --uncommitted              # Staged, unstaged, and untracked changes
-codex review --base main                # Changes against base branch
-codex review --commit HEAD~3            # Changes from a specific commit
-codex review "Check for security issues"  # Custom instructions
-```
 
 ## Session Continuation
 

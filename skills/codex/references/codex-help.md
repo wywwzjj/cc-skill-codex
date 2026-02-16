@@ -305,11 +305,24 @@ responses_websockets_v2          under development  false
 
 ## Code Review Command: `codex review`
 
-Run code review non-interactively (useful for Claude to invoke):
+Run code review non-interactively (useful for Claude to invoke).
+
+⚠️ **Diff source flags (`--uncommitted`, `--base`, `--commit`) and `[PROMPT]` are mutually exclusive.**
+
 ```bash
+# Diff source flags (no custom prompt allowed):
 codex review --uncommitted              # Review staged, unstaged, and untracked changes
 codex review --base main                # Review changes against main branch
 codex review --commit HEAD~3            # Review changes introduced by a specific commit
+
+# Custom prompt (uses default diff source):
 codex review "Check for security issues"  # Custom review instructions
+
+# Optional metadata (can combine with either pattern above):
 codex review --title "feat: add auth"   # Optional commit title in review summary
+```
+
+```bash
+# ❌ WRONG — causes error: "the argument '--uncommitted' cannot be used with '[PROMPT]'"
+codex review --uncommitted "Check for security issues"
 ```
