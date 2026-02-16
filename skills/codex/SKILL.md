@@ -1,13 +1,13 @@
 ---
 name: codex
-description: Invoke Codex CLI for high-reasoning tasks requiring GPT-5.3 capabilities. Use when user mentions "Codex", requests design/architecture, code review, debug analysis, or algorithm design. Codex = Brain (thinking), Claude = Hands (implementation). Supports session continuation for long-term projects.
+description: Invoke Codex CLI (gpt-5.3-codex model) for high-reasoning tasks. Use when user mentions "Codex", requests design/architecture, code review, debug analysis, or algorithm design. Codex = Brain (thinking), Claude = Hands (implementation). Supports session continuation for long-term projects.
 ---
 
 # Codex CLI Integration (v0.101.0+)
 
 ## Critical Rules
 
-1. **Always use `codex exec`** — `codex` (interactive) fails in Claude Code with "stdout is not a terminal"
+1. **Always use `codex exec`** — `codex` (interactive) fails in Claude Code. Exception: `codex review` is already non-interactive
 2. **Always add `-c hide_agent_reasoning=true`** — hides thinking output to reduce context consumption
 3. **Multi-line prompts must use heredoc** — never use unescaped newlines in quotes, never add `-` after `--last`
 
@@ -21,8 +21,6 @@ codex exec -m gpt-5.3-codex -s read-only \
 ```
 
 Default to **read-only** — Codex thinks, Claude implements. Use `-s workspace-write` only when user explicitly asks Codex to modify files.
-
-Use `-m gpt-5.3` (without `-codex`) for non-code tasks requiring broad knowledge.
 
 ## Code Review
 
