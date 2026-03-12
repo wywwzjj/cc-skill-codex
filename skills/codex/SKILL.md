@@ -1,20 +1,21 @@
 ---
 name: codex
-description: Invoke Codex CLI (gpt-5.3-codex model) for high-reasoning tasks. Use when user mentions "Codex", requests design/architecture, code review, debug analysis, or algorithm design. Codex = Brain (thinking), Claude = Hands (implementation). Supports session continuation for long-term projects.
+description: Invoke Codex CLI (`gpt-5.4` by default) for high-reasoning tasks. Use when user mentions "Codex", requests design/architecture, code review, debug analysis, or algorithm design. Codex = Brain (thinking), Claude = Hands (implementation). Supports session continuation for long-term projects.
 ---
 
-# Codex CLI Integration (v0.101.0+)
+# Codex CLI Integration (v0.114.0+)
 
 ## Critical Rules
 
 1. **Always use `codex exec`** — `codex` (interactive) fails in Claude Code
 2. **Always add `-c hide_agent_reasoning=true`** — hides thinking output to reduce context consumption
 3. **Multi-line prompts must use heredoc** — never use unescaped newlines in quotes, never add `-` after `--last`
+4. **New sessions default to `gpt-5.4` with high reasoning** — resumed sessions inherit the original session settings unless you override them
 
 ## Default Command
 
 ```bash
-codex exec -m gpt-5.3-codex -s read-only \
+codex exec -m gpt-5.4 -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
   "prompt"
@@ -28,18 +29,19 @@ Sessions persist across Claude Code restarts. Detect continuation when user says
 
 **Resume**:
 ```bash
-codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "prompt"
+codex exec -c hide_agent_reasoning=true resume --last "prompt"
 ```
 
 **Resume with multi-line**:
 ```bash
-codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last <<'EOF'
+codex exec -c hide_agent_reasoning=true resume --last <<'EOF'
 Multi-line prompt here
 EOF
 ```
 
 Key constraints:
-- `-m` must match original session's model, placed **before** `resume`
+- Resume inherits the original session's model and reasoning settings by default
+- Add `-m` or `-c model_reasoning_effort=...` only when you intentionally want to override them
 - `--last` resumes the globally most recent session (not per-instance)
 - New/fresh requests → omit `resume --last`
 
@@ -52,10 +54,13 @@ Key constraints:
 | stdout is not a terminal | Use `codex exec`, not `codex` |
 | Not authenticated | Run `codex login` |
 
-## Reference Docs
+## Optional Local Verification
 
-- `references/codex-help.md` — Full CLI flags and commands
-- `references/command-patterns.md` — Workflow examples
-- `references/session-workflows.md` — Session continuation details
-- `references/troubleshooting.md` — Error solutions
-- `references/codex-config.md` — Configuration reference
+For version-sensitive CLI details, check your installed Codex directly:
+
+```bash
+codex --help
+codex exec --help
+codex exec resume --help
+codex features list
+```

@@ -1,10 +1,10 @@
 # cc-skill-codex
 
-A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI integration with GPT-5.3 high-reasoning capabilities.
+A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI integration with `gpt-5.4` as the default model.
 
 **Philosophy**: Codex = Brain (thinking), Claude = Hands (implementation)
 
-**Codex CLI Version**: v0.101.0+
+**Codex CLI Version**: v0.114.0+
 
 ## What is this?
 
@@ -27,14 +27,7 @@ cc-skill-codex/                  # Plugin root
 ├── LICENSE                      # Apache 2.0 license
 └── skills/                      # Skills provided by this plugin
     └── codex/                  # The "codex" skill
-        ├── SKILL.md            # Main skill definition (loaded by Claude Code)
-        └── references/         # Reference documentation (for users)
-            ├── command-patterns.md      # Design → Implementation workflows
-            ├── session-workflows.md     # Session continuation patterns
-            ├── troubleshooting.md       # Error solutions and debugging
-            ├── codex-config.md          # Complete configuration reference
-            ├── codex-help.md            # Codex CLI v0.101 help reference
-            └── advanced-patterns.md     # Advanced options
+        └── SKILL.md            # Main skill definition (loaded by Claude Code)
 ```
 
 **How it works**:
@@ -42,7 +35,7 @@ cc-skill-codex/                  # Plugin root
 2. You install the **plugin** (`cc-skill-codex`) from the marketplace
 3. The plugin provides the **skill** (`codex`)
 4. Claude Code loads `skills/codex/SKILL.md` when the skill is invoked
-5. All other files are documentation for users
+5. `skills/codex/SKILL.md` is the primary maintained documentation surface
 
 ---
 
@@ -52,7 +45,7 @@ cc-skill-codex/                  # Plugin root
 
 1. **Codex CLI** installed and authenticated:
    ```bash
-   codex --version  # v0.101+
+   codex --version  # v0.114+
    codex login
    ```
 
@@ -96,7 +89,7 @@ After installation, verify the skill is working:
 > Use Codex to design a binary search tree in Rust
 ```
 
-The skill will invoke Codex CLI with GPT-5.3 high-reasoning capabilities.
+The skill will invoke Codex CLI with `gpt-5.4` by default.
 
 ---
 
@@ -106,7 +99,7 @@ The skill will invoke Codex CLI with GPT-5.3 high-reasoning capabilities.
 
 ```bash
 # Check if Codex CLI is installed
-codex --version  # Requires v0.101+
+codex --version  # Requires v0.114+
 
 # If not installed, follow OpenAI's installation instructions
 # https://developers.openai.com/codex/cli/installation
@@ -165,7 +158,7 @@ Select "Manage Plugins" to see cc-skill-codex in your list.
 ```
 
 Codex will:
-1. Execute: `codex exec -m gpt-5.3-codex -s read-only -c model_reasoning_effort=high -c hide_agent_reasoning=true "Design a REST API..."`
+1. Execute: `codex exec -m gpt-5.4 -s read-only -c model_reasoning_effort=high -c hide_agent_reasoning=true "Design a REST API..."`
 2. Provide high-level architecture, endpoint design, data models
 3. Session auto-saved for continuation
 
@@ -201,7 +194,7 @@ Codex will:
 ```
 
 Codex will:
-1. Execute: `codex exec -m gpt-5.3-codex -c hide_agent_reasoning=true resume --last "Add comprehensive error handling to the API"`
+1. Execute: `codex exec -c hide_agent_reasoning=true resume --last "Add comprehensive error handling to the API"`
 2. Resume with full context from previous session
 3. Build on previous design decisions
 
@@ -238,9 +231,8 @@ Codex will:
 - **Best practice**: Be explicit about what you want Codex to do
 
 ### Model Usage
-- **gpt-5.3** (default): General reasoning, architecture design, code review
-- **gpt-5.3-codex**: Code editing tasks (rare - usually let Claude implement)
-- **Default reasoning**: High reasoning effort for maximum quality
+- **gpt-5.4** (default): Design, architecture, code review, debug analysis, and other high-reasoning tasks
+- **Default reasoning**: New sessions use high reasoning effort by default; resumed sessions inherit the original session settings unless explicitly overridden
 
 ### Session Continuation
 - **Keywords**: "continue", "resume", "add to that", "keep going"
@@ -260,16 +252,12 @@ Codex will:
 
 ## Documentation
 
-For detailed information, see:
-- `skills/codex/SKILL.md` - Main skill documentation
-- `skills/codex/references/command-patterns.md` - Design → Implementation workflows
-- `skills/codex/references/session-workflows.md` - Session continuation examples
-- `skills/codex/references/troubleshooting.md` - Error solutions and debugging
-- `skills/codex/references/codex-config.md` - Configuration reference
+For the plugin docs, see:
+- `skills/codex/SKILL.md` - Main skill definition, command patterns, and common failure guidance
 
 ---
 
 **License**: Apache 2.0
-**Version**: 3.0.0
-**Codex CLI**: v0.101+
+**Version**: 3.1.0
+**Codex CLI**: v0.114+
 **Philosophy**: Codex = Brain (thinking), Claude = Hands (implementation)
