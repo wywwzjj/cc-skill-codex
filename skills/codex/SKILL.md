@@ -9,8 +9,9 @@ description: Invoke Codex CLI (`gpt-5.4` by default) for high-reasoning tasks. U
 
 1. **Always use `codex exec`** — `codex` (interactive) fails in Claude Code
 2. **Always add `-c hide_agent_reasoning=true`** — hides thinking output to reduce context consumption
-3. **Multi-line prompts must use heredoc** — never use unescaped newlines in quotes, never add `-` after `--last`
-4. **New sessions default to `gpt-5.4` with high reasoning** — resumed sessions inherit the original session settings unless you override them
+3. **Always add `2>/dev/null`** — intermediate process output (session info, tool calls, token stats) goes to stderr; suppress it to avoid filling context
+4. **Multi-line prompts must use heredoc** — never use unescaped newlines in quotes, never add `-` after `--last`
+5. **New sessions default to `gpt-5.4` with high reasoning** — resumed sessions inherit the original session settings unless you override them
 
 ## Default Command
 
@@ -18,7 +19,7 @@ description: Invoke Codex CLI (`gpt-5.4` by default) for high-reasoning tasks. U
 codex exec -m gpt-5.4 -s read-only \
   -c model_reasoning_effort=high \
   -c hide_agent_reasoning=true \
-  "prompt"
+  "prompt" 2>/dev/null
 ```
 
 Default to **read-only** — Codex thinks, Claude implements. Use `-s workspace-write` only when user explicitly asks Codex to modify files.
@@ -29,12 +30,12 @@ Sessions persist across Claude Code restarts. Detect continuation when user says
 
 **Resume**:
 ```bash
-codex exec -c hide_agent_reasoning=true resume --last "prompt"
+codex exec -c hide_agent_reasoning=true resume --last "prompt" 2>/dev/null
 ```
 
 **Resume with multi-line**:
 ```bash
-codex exec -c hide_agent_reasoning=true resume --last <<'EOF'
+codex exec -c hide_agent_reasoning=true resume --last 2>/dev/null <<'EOF'
 Multi-line prompt here
 EOF
 ```
