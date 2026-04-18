@@ -1,7 +1,7 @@
 {
   "name": "cc-skill-codex",
   "description": "Invoke Codex CLI for high-reasoning tasks with gpt-5.4 by default. Codex = Brain (design, review, debug analysis), Claude = Hands (implementation). Supports session continuation with persistent context.",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "author": {
     "name": "wywwzjj"
   }
