@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is **cc-skill-codex**, a Claude Code plugin that integrates OpenAI's Codex CLI (v0.114.0+) with `gpt-5.4` as the default model. The core philosophy is **Codex = Brain (thinking), Claude = Hands (implementation)**.
+This is **cc-skill-codex**, a Claude Code plugin that integrates OpenAI's Codex CLI (v0.114.0+) as a peer coding agent. Both Codex and Claude can read and write code — they're picked by task fit, not by role. The skill's flagship use case is **adversarial / steerable code review**; it also covers standard review, deep design analysis, debugging investigations, and delegated tasks.
+
+The skill does **not** pin a specific Codex model — it relies on whatever Codex CLI's current default is. This avoids per-release maintenance churn.
 
 ## Architecture
 
@@ -28,7 +30,7 @@ cc-skill-codex-marketplace/           # Marketplace root
 ### Multi-line prompts require heredoc
 ```bash
 # Correct
-codex exec -c hide_agent_reasoning=true resume --last <<'EOF'
+codex exec resume --last <<'EOF'
 Multi-line prompt
 EOF
 
@@ -43,32 +45,27 @@ codex exec resume --last -
 ### Session resume inherits prior settings by default
 ```bash
 # Recommended - rely on the original session settings unless you intend to override them
-codex exec -c hide_agent_reasoning=true resume --last "prompt"
+codex exec resume --last "prompt"
 
-# Override only when you explicitly want a different model or reasoning level
-codex exec -m gpt-5.4 -c model_reasoning_effort=high -c hide_agent_reasoning=true resume --last "prompt"
+# Override only when you explicitly want a different reasoning level or model
+codex exec -c model_reasoning_effort=high resume --last "prompt"
 ```
 
 ### Default command structure
 ```bash
-codex exec -m gpt-5.4 -s read-only \
+codex exec -s read-only \
   -c model_reasoning_effort=high \
-  -c hide_agent_reasoning=true \
-  "prompt"
+  "prompt" 2>/tmp/codex_stderr.log
 ```
+
+`stderr` redirection is required: it diverts session header / token stats / (when enabled) reasoning summaries to a log file so they don't pollute Claude's context.
 
 ## Plugin Installation Flow
 
 1. User adds marketplace: `/plugin marketplace add wywwzjj/cc-skill-codex`
 2. User installs plugin: `/plugin install cc-skill-codex@cc-skill-codex-marketplace`
 3. Claude Code loads `skills/codex/SKILL.md` when skill is invoked
-4. Skill triggers on: "Codex" keyword, "`gpt-5.4`" mention, or session continuation phrases
-
-## Default Model
-
-| Model | Use Case |
-|-------|----------|
-| `gpt-5.4` | Default model for design, architecture, review, and debug analysis |
+4. Skill triggers on: "Codex" keyword or session continuation phrases
 
 ## Sandbox Modes
 

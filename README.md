@@ -1,8 +1,8 @@
 # cc-skill-codex
 
-A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI integration with `gpt-5.4` as the default model.
+A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI integration. The skill uses whatever model Codex CLI is configured to default to — no model is pinned by the skill itself.
 
-**Philosophy**: Codex = Brain (thinking), Claude = Hands (implementation)
+**Positioning**: Codex is a peer coding agent. Strongest fit is **adversarial / steerable code review**; also useful for standard review, deep design analysis, debugging investigations, and delegated tasks. Both Codex and Claude can read and write code — pick by task fit, not by role.
 
 **Codex CLI Version**: v0.114.0+
 
@@ -89,7 +89,7 @@ After installation, verify the skill is working:
 > Use Codex to design a binary search tree in Rust
 ```
 
-The skill will invoke Codex CLI with `gpt-5.4` by default.
+The skill will invoke Codex CLI using whatever model your Codex CLI is configured to default to.
 
 ---
 
@@ -150,89 +150,86 @@ Check the plugin is installed:
 
 Select "Manage Plugins" to see cc-skill-codex in your list.
 
-### Step 5: Use Codex for Design (Brain)
+### Step 5: Use Codex for Adversarial / Steerable Review (Flagship)
 
-**Design request** (Codex thinks, Claude implements):
+The strongest reason to reach for Codex: pressure-test a design rather than nitpick lines.
+
+**Adversarial review request**:
 ```
-> Use Codex to design a REST API for a blog system
-```
-
-Codex will:
-1. Execute: `codex exec -m gpt-5.4 -s read-only -c model_reasoning_effort=high -c hide_agent_reasoning=true "Design a REST API..."`
-2. Provide high-level architecture, endpoint design, data models
-3. Session auto-saved for continuation
-
-**Then implement with Claude**:
-```
-> Implement the user authentication endpoint based on Codex's design
-```
-
-Claude will implement the code using Codex's design.
-
-### Step 6: Use Codex for Code Review
-
-**Review request**:
-```
-> Use Codex to review this authentication code for security issues
+> Use Codex to challenge the caching/retry design in src/api/client.ts — pressure-test for race conditions and rollback gaps
 ```
 
 Codex will:
-1. Analyze with high reasoning (read-only mode)
-2. Identify vulnerabilities and best practice violations
-3. Provide improvement recommendations
+1. Execute a read-only `codex exec` with a steered prompt that explicitly asks it to challenge the design, surface hidden assumptions, and identify failure modes
+2. Return concrete risks (race conditions, data loss paths, auth weaknesses, reliability cliffs) with reasoning
+3. Often suggest where a different design would have been safer or simpler
 
-**Then fix with Claude**:
+**Why this is the flagship**: an independent agent challenging your design catches what an in-the-flow reviewer misses. Steer it at a specific risk area for best results — generic "review this" is much weaker than "challenge whether retries belong in this layer".
+
+### Step 6: Use Codex for Standard Code Review or Design Analysis
+
+**Standard review request**:
 ```
-> Fix the security issues in auth.py:45-67 as Codex suggested
+> Use Codex to review auth.py for security issues
 ```
+
+**Design analysis request**:
+```
+> Use Codex to analyze approaches for a multi-tenant rate limiter
+```
+
+Codex returns its findings; you (or Claude) decide what to do with them. Codex can also be delegated the fix directly when appropriate — see Step 8.
 
 ### Step 7: Continue a Session
 
-**Follow-up request**:
+**Follow-up request** (continuing the adversarial review from Step 5):
 ```
-> Continue with that API - add error handling
-```
-
-Codex will:
-1. Execute: `codex exec -c hide_agent_reasoning=true resume --last "Add comprehensive error handling to the API"`
-2. Resume with full context from previous session
-3. Build on previous design decisions
-
-**Why this matters**: Codex sessions persist across Claude Code restarts - you can resume days later with full context.
-
-### Step 8: Debug Analysis
-
-**Debug request**:
-```
-> Use Codex to analyze why my queue implementation deadlocks under high concurrency
+> Continue that review — also pressure-test the rollback path under partial failure
 ```
 
 Codex will:
-1. Perform deep reasoning analysis
-2. Identify root cause and race conditions
-3. Suggest debugging approach and fixes
+1. Execute: `codex exec resume --last "Pressure-test the rollback path under partial failure" 2>/tmp/codex_stderr.log`
+2. Resume with full context from the previous session — same target code, same prior reasoning
+3. Build on what was already challenged rather than starting over
 
-**Then implement fix with Claude**:
+**Why this matters**: Codex sessions persist across Claude Code restarts. Multi-day reviews and investigations stay coherent — you can resume days later with full prior context.
+
+### Step 8: Debug Investigation or Delegated Task
+
+**Debug investigation** (read-only):
 ```
-> Apply the fix Codex suggested at lines 23-45
+> Use Codex to investigate why my queue implementation deadlocks under high concurrency
 ```
+
+Codex will trace the bug end-to-end and propose root cause + fix. You can then apply the fix yourself (with Claude) for tight control.
+
+**Delegated task** (workspace-write — Codex actually writes the patch):
+```
+> Have Codex fix the deadlock in queue.py — apply the smallest safe patch
+```
+
+When the user clearly says "have Codex fix" or "let Codex patch", invoke with `-s workspace-write` and let Codex own the change.
+
+**Tradeoff**: read-only investigation gives Claude/you full control over the patch; delegated workspace-write is faster but Codex picks the implementation. Pick by how much you trust the local context vs. value the speed.
 
 ---
 
 ## Quick Tips
 
 ### Workflow Pattern
-- **Codex = Brain**: Design, architecture, code review, debug analysis (read-only)
-- **Claude = Hands**: Implementation, refactoring, file modifications
+- **Adversarial / steerable review** is the flagship — challenge designs, pressure-test tradeoffs, find hidden risks
+- **Default sandbox is `read-only`** — most invocations are analysis, review, or investigation
+- **Use `-s workspace-write` only when delegating a fix** — when the user explicitly says "have Codex fix it"
+- **Pick by task fit, not by role** — both Codex and Claude can read and write code
 
 ### Triggering the Skill
-- **Explicit**: "Use Codex to design...", "Use Codex to review..."
+- **Explicit**: "Use Codex to challenge...", "Use Codex to pressure-test...", "Use Codex to review..."
 - **Keywords**: Mention "Codex" to explicitly trigger the skill
-- **Best practice**: Be explicit about what you want Codex to do
+- **Steered**: For adversarial reviews, name the risk area — "challenge the retry design", "look for race conditions in the connection pool". Generic asks underperform focused ones.
 
 ### Model Usage
-- **gpt-5.4** (default): Design, architecture, code review, debug analysis, and other high-reasoning tasks
-- **Default reasoning**: New sessions use high reasoning effort by default; resumed sessions inherit the original session settings unless explicitly overridden
+- **Model**: The skill does not pin a model — Codex CLI's current default is used (whichever model your installed Codex version ships with). To override, pass `-m <model>`.
+- **Reasoning effort**: New sessions use `model_reasoning_effort=high` by default; resumed sessions inherit the original session settings unless explicitly overridden.
 
 ### Session Continuation
 - **Keywords**: "continue", "resume", "add to that", "keep going"
@@ -242,11 +239,12 @@ Codex will:
 ### Common Use Cases
 | Task | Use Codex? | Example |
 |------|-----------|---------|
-| Design architecture | ✅ Yes | "Use Codex to design a caching layer" |
-| Review security | ✅ Yes | "Use Codex to review for vulnerabilities" |
-| Debug analysis | ✅ Yes | "Use Codex to analyze this deadlock" |
-| Implement code | ❌ No | Let Claude implement based on Codex's design |
-| Refactor code | ❌ No | Let Claude refactor based on Codex's review |
+| **Adversarial / steerable review** | ✅ Strongest fit | "Challenge the caching design — find race conditions" |
+| Standard code review | ✅ Yes | "Use Codex to review auth.py for security" |
+| Design / architecture analysis | ✅ Yes | "Use Codex to analyze rate-limiter approaches" |
+| Debug investigation | ✅ Yes | "Use Codex to trace why this deadlocks" |
+| Delegated fix / refactor | ✅ When delegated explicitly | "Have Codex apply the smallest safe patch" |
+| Quick edit you can do yourself | ❌ Skip | Just have Claude do it |
 
 ---
 
@@ -258,6 +256,6 @@ For the plugin docs, see:
 ---
 
 **License**: Apache 2.0
-**Version**: 3.1.0
+**Version**: 3.2.0
 **Codex CLI**: v0.114+
-**Philosophy**: Codex = Brain (thinking), Claude = Hands (implementation)
+**Positioning**: Codex as a peer coding agent — flagship use case is adversarial / steerable code review.
