@@ -43,13 +43,14 @@ Default to **read-only** — most Codex invocations are analysis or review. Use 
 When the user wants Codex to question the design rather than nitpick lines:
 
 ```bash
-codex exec -s read-only -c model_reasoning_effort=high 2>/tmp/codex_stderr.log <<'EOF'
+codex exec -s read-only -c model_reasoning_effort=high 2>/tmp/codex_stderr.log <<'EOF' && echo "SESSION_ID=$(grep 'session id:' /tmp/codex_stderr.log | tail -1 | awk '{print $NF}')"
 Adversarial review of <target>. Challenge the chosen approach. Surface hidden assumptions. Identify failure modes — race conditions, data loss, rollback gaps, auth weaknesses, reliability cliffs. Where would a different design have been safer or simpler?
 
 Focus: <user's specific concern, e.g., "the retry/caching strategy">
 EOF
-echo "SESSION_ID=$(grep 'session id:' /tmp/codex_stderr.log | tail -1 | awk '{print $NF}')"
 ```
+
+The `&&` (rather than a separate `echo` line) is deliberate: it ensures the SESSION_ID is only emitted when Codex succeeded. A separate `echo` could grep the log on failure and surface a stale ID from a previous run.
 
 This pays off most when **steered at a real risk area**. Always weave the user's specific focus into the prompt — generic adversarial review is much weaker than focused.
 

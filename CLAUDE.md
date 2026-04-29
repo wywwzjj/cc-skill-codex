@@ -54,9 +54,8 @@ codex exec -s read-only -c model_reasoning_effort=high "prompt" 2>/tmp/codex_std
 codex exec resume <SESSION_ID> "prompt" 2>/tmp/codex_stderr.log
 ```
 
-The `&& echo "SESSION_ID=..."` tail is load-bearing: it lifts the session id from `/tmp/codex_stderr.log` (which gets overwritten by the next call) into stdout. Use `--last` only as a fallback when the id is unrecoverable.
+The `&& echo "SESSION_ID=..."` tail is load-bearing: it lifts the session id from `/tmp/codex_stderr.log` (which gets overwritten by the next call) into stdout. The `&&` (vs. a separate echo line) prevents emitting a stale ID from a prior run if codex fails. Use `--last` only as a fallback when the id is unrecoverable.
 
-### Session resume inherits prior settings by default
 Resume calls inherit the original session's model and reasoning settings — only override when you explicitly want a different reasoning level or model:
 
 ```bash
