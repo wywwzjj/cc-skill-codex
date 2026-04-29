@@ -30,35 +30,48 @@ cc-skill-codex-marketplace/           # Marketplace root
 ### Multi-line prompts require heredoc
 ```bash
 # Correct
-codex exec resume --last <<'EOF'
+codex exec resume <SESSION_ID> <<'EOF'
 Multi-line prompt
 EOF
 
 # Wrong - unescaped newlines break parsing
-codex exec resume --last "Line 1
+codex exec resume <SESSION_ID> "Line 1
 Line 2"
 
 # Wrong - dash after --last parsed as SESSION_ID
 codex exec resume --last -
 ```
 
-### Session resume inherits prior settings by default
-```bash
-# Recommended - rely on the original session settings unless you intend to override them
-codex exec resume --last "prompt"
+### Resume by session ID, not `--last`
+`codex exec resume --last` resumes the globally most recent recorded session — it's filtered by cwd but still races with any other Codex call in the same repo (parallel reviews, the user invoking Codex directly, etc.). Capture the session ID at the end of each new run and reuse it:
 
-# Override only when you explicitly want a different reasoning level or model
-codex exec -c model_reasoning_effort=high resume --last "prompt"
+```bash
+# First call — capture session id into stdout (and therefore Claude's context)
+codex exec -s read-only -c model_reasoning_effort=high "prompt" 2>/tmp/codex_stderr.log \
+  && echo "SESSION_ID=$(grep 'session id:' /tmp/codex_stderr.log | tail -1 | awk '{print $NF}')"
+
+# Resume with the captured id (id is in Claude's context from the prior turn)
+codex exec resume <SESSION_ID> "prompt" 2>/tmp/codex_stderr.log
+```
+
+The `&& echo "SESSION_ID=..."` tail is load-bearing: it lifts the session id from `/tmp/codex_stderr.log` (which gets overwritten by the next call) into stdout. Use `--last` only as a fallback when the id is unrecoverable.
+
+### Session resume inherits prior settings by default
+Resume calls inherit the original session's model and reasoning settings — only override when you explicitly want a different reasoning level or model:
+
+```bash
+codex exec -c model_reasoning_effort=high resume <SESSION_ID> "prompt"
 ```
 
 ### Default command structure
 ```bash
 codex exec -s read-only \
   -c model_reasoning_effort=high \
-  "prompt" 2>/tmp/codex_stderr.log
+  "prompt" 2>/tmp/codex_stderr.log \
+  && echo "SESSION_ID=$(grep 'session id:' /tmp/codex_stderr.log | tail -1 | awk '{print $NF}')"
 ```
 
-`stderr` redirection is required: it diverts session header / token stats / (when enabled) reasoning summaries to a log file so they don't pollute Claude's context.
+`stderr` redirection diverts session header / token stats / reasoning summaries to a log file so they don't pollute Claude's context. The trailing `echo` puts the session id where future turns can find it (Claude's conversation context).
 
 ## Plugin Installation Flow
 

@@ -188,11 +188,13 @@ Codex returns its findings; you (or Claude) decide what to do with them. Codex c
 ```
 
 Codex will:
-1. Execute: `codex exec resume --last "Pressure-test the rollback path under partial failure" 2>/tmp/codex_stderr.log`
+1. Resume the prior session **by ID** (not `--last`): `codex exec resume <SESSION_ID> "Pressure-test the rollback path under partial failure" 2>/tmp/codex_stderr.log`
 2. Resume with full context from the previous session — same target code, same prior reasoning
 3. Build on what was already challenged rather than starting over
 
-**Why this matters**: Codex sessions persist across Claude Code restarts. Multi-day reviews and investigations stay coherent — you can resume days later with full prior context.
+**Why ID-based resume matters**: `--last` resumes the globally most recent Codex session and races with any other Codex call (parallel reviews, the user invoking Codex directly, background tasks). The skill captures the session ID at the end of each new run by appending `&& echo "SESSION_ID=$(grep 'session id:' /tmp/codex_stderr.log | tail -1 | awk '{print $NF}')"` — that ID stays in Claude's context for follow-ups. `--last` is reserved as a fallback for when the ID is genuinely unrecoverable.
+
+**Why session continuation matters**: Codex sessions persist across Claude Code restarts. Multi-day reviews and investigations stay coherent — you can resume days later with full prior context.
 
 ### Step 8: Debug Investigation or Delegated Task
 
