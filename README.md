@@ -4,7 +4,7 @@ A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI int
 
 **Positioning**: Codex is a peer coding agent. Strongest fit is **adversarial / steerable code review**; also useful for standard review, deep design analysis, debugging investigations, and delegated tasks. Both Codex and Claude can read and write code — pick by task fit, not by role.
 
-**Codex CLI Version**: v0.114.0+
+**Codex CLI Version**: v0.142.2 (verified; v0.142+ recommended)
 
 ## What is this?
 
@@ -45,7 +45,7 @@ cc-skill-codex/                  # Plugin root
 
 1. **Codex CLI** installed and authenticated:
    ```bash
-   codex --version  # v0.114+
+   codex --version  # v0.142+ recommended
    codex login
    ```
 
@@ -99,7 +99,7 @@ The skill will invoke Codex CLI using whatever model your Codex CLI is configure
 
 ```bash
 # Check if Codex CLI is installed
-codex --version  # Requires v0.114+
+codex --version  # v0.142+ recommended
 
 # If not installed, follow OpenAI's installation instructions
 # https://developers.openai.com/codex/cli/installation
@@ -188,11 +188,11 @@ Codex returns its findings; you (or Claude) decide what to do with them. Codex c
 ```
 
 Codex will:
-1. Resume the prior session **by ID** (not `--last`): `codex exec resume <SESSION_ID> "Pressure-test the rollback path under partial failure" 2>/tmp/codex_stderr.log`
+1. Resume the prior session **by ID** (not `--last`): `LOG=$(mktemp) && codex exec -s read-only resume <SESSION_ID> "Pressure-test the rollback path under partial failure" 2>"$LOG" || cat "$LOG"` — note `-s read-only` is re-pinned because sandbox is **not** inherited on resume
 2. Resume with full context from the previous session — same target code, same prior reasoning
 3. Build on what was already challenged rather than starting over
 
-**Why ID-based resume matters**: `--last` resumes the globally most recent Codex session and races with any other Codex call (parallel reviews, the user invoking Codex directly, background tasks). The skill captures the session ID at the end of each new run by appending `&& echo "SESSION_ID=$(grep 'session id:' /tmp/codex_stderr.log | tail -1 | awk '{print $NF}')"` — that ID stays in Claude's context for follow-ups. `--last` is reserved as a fallback for when the ID is genuinely unrecoverable.
+**Why ID-based resume matters**: `--last` resumes the globally most recent Codex session and races with any other Codex call (parallel reviews, the user invoking Codex directly, background tasks). The skill captures the session ID at the end of each new run by appending `&& SESSION_ID=$(awk '/session id:/{id=$NF} END{if(id) print id; else exit 1}' "$LOG") && echo "SESSION_ID=$SESSION_ID"`, where `LOG=$(mktemp)` is a per-call log file — that ID stays in Claude's context for follow-ups. A per-invocation `mktemp` (not a shared fixed path) keeps parallel Codex calls from clobbering each other's session id. `--last` is reserved as a fallback for when the ID is genuinely unrecoverable.
 
 **Why session continuation matters**: Codex sessions persist across Claude Code restarts. Multi-day reviews and investigations stay coherent — you can resume days later with full prior context.
 
@@ -220,7 +220,7 @@ When the user clearly says "have Codex fix" or "let Codex patch", invoke with `-
 
 ### Workflow Pattern
 - **Adversarial / steerable review** is the flagship — challenge designs, pressure-test tradeoffs, find hidden risks
-- **Default sandbox is `read-only`** — most invocations are analysis, review, or investigation
+- **The skill pins `-s read-only` by default** — most invocations are analysis, review, or investigation. Always pin it explicitly; Codex CLI's *configured* default may be more permissive (often `danger-full-access`)
 - **Use `-s workspace-write` only when delegating a fix** — when the user explicitly says "have Codex fix it"
 - **Pick by task fit, not by role** — both Codex and Claude can read and write code
 
@@ -231,7 +231,7 @@ When the user clearly says "have Codex fix" or "let Codex patch", invoke with `-
 
 ### Model Usage
 - **Model**: The skill does not pin a model — Codex CLI's current default is used (whichever model your installed Codex version ships with). To override, pass `-m <model>`.
-- **Reasoning effort**: New sessions use `model_reasoning_effort=high` by default; resumed sessions inherit the original session settings unless explicitly overridden.
+- **Reasoning effort**: New sessions use `model_reasoning_effort=high` by default; resumed sessions inherit the original session's model + reasoning effort, but **not** its sandbox — re-pin `-s read-only` on every resume.
 
 ### Session Continuation
 - **Keywords**: "continue", "resume", "add to that", "keep going"
@@ -258,6 +258,6 @@ For the plugin docs, see:
 ---
 
 **License**: Apache 2.0
-**Version**: 3.2.0
-**Codex CLI**: v0.114+
+**Version**: 3.2.8
+**Codex CLI**: v0.142+
 **Positioning**: Codex as a peer coding agent — flagship use case is adversarial / steerable code review.

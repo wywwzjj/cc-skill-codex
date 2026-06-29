@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is **cc-skill-codex**, a Claude Code plugin that integrates OpenAI's Codex CLI (v0.114.0+) as a peer coding agent. Both Codex and Claude can read and write code — they're picked by task fit, not by role. The skill's flagship use case is **adversarial / steerable code review**; it also covers standard review, deep design analysis, debugging investigations, and delegated tasks.
+This is **cc-skill-codex**, a Claude Code plugin that integrates OpenAI's Codex CLI (verified against v0.142.2) as a peer coding agent. Both Codex and Claude can read and write code — they're picked by task fit, not by role. The skill's flagship use case is **adversarial / steerable code review**; it also covers standard review, deep design analysis, debugging investigations, and delegated tasks.
 
 The skill does **not** pin a specific Codex model — it relies on whatever Codex CLI's current default is. This avoids per-release maintenance churn.
 
@@ -29,12 +29,13 @@ cc-skill-codex-marketplace/           # Marketplace root
 
 ### Multi-line prompts require heredoc
 ```bash
-# Correct
-codex exec resume <SESSION_ID> <<'EOF'
+# Correct (note -s read-only re-pinned before the subcommand)
+codex exec -s read-only resume <SESSION_ID> <<'EOF'
 Multi-line prompt
 EOF
 
-# Wrong - unescaped newlines break parsing
+# Fragile - literal newlines in a quoted arg work in bash/zsh but are brittle
+# when embedded in tool calls; prefer heredoc for multi-line prompts
 codex exec resume <SESSION_ID> "Line 1
 Line 2"
 
@@ -47,30 +48,37 @@ codex exec resume --last -
 
 ```bash
 # First call — capture session id into stdout (and therefore Claude's context)
-codex exec -s read-only -c model_reasoning_effort=high "prompt" 2>/tmp/codex_stderr.log \
-  && echo "SESSION_ID=$(grep 'session id:' /tmp/codex_stderr.log | tail -1 | awk '{print $NF}')"
+LOG=$(mktemp) && codex exec -s read-only -c model_reasoning_effort=high "prompt" 2>"$LOG" \
+  && SESSION_ID=$(awk '/session id:/{id=$NF} END{if(id) print id; else exit 1}' "$LOG") \
+  && echo "SESSION_ID=$SESSION_ID" \
+  || cat "$LOG"
 
-# Resume with the captured id (id is in Claude's context from the prior turn)
-codex exec resume <SESSION_ID> "prompt" 2>/tmp/codex_stderr.log
+# Resume with the captured id (id is in Claude's context from the prior turn).
+# Re-pin -s read-only: sandbox is NOT inherited on resume.
+LOG=$(mktemp) && codex exec -s read-only resume <SESSION_ID> "prompt" 2>"$LOG" || cat "$LOG"
 ```
 
-The `&& echo "SESSION_ID=..."` tail is load-bearing: it lifts the session id from `/tmp/codex_stderr.log` (which gets overwritten by the next call) into stdout. The `&&` (vs. a separate echo line) prevents emitting a stale ID from a prior run if codex fails. Use `--last` only as a fallback when the id is unrecoverable.
+The `SESSION_ID=…` tail is load-bearing: it lifts the session id from the per-call log into stdout. Four deliberate choices: (1) the `&&` chain emits the id only when codex *succeeded*, never a stale value; (2) the `awk … else exit 1` fails the chain if no session id was parsed, so a blank `SESSION_ID=` is never recorded; (3) `LOG=$(mktemp)` gives each call its own log file — a fixed shared path (`/tmp/codex_stderr.log`) would let parallel Codex calls clobber each other's session id; (4) the trailing `|| cat "$LOG"` fires on any failure and surfaces the captured stderr, so errors stay debuggable instead of being swallowed by `2>/dev/null`. Use `--last` only as a fallback when the id is unrecoverable.
 
-Resume calls inherit the original session's model and reasoning settings — only override when you explicitly want a different reasoning level or model:
+Resume inherits the original session's model and reasoning effort — but **not** its sandbox, which resets to the configured default (often `danger-full-access`). So pass `-s read-only` on every resume, and override `-m`/`-c model_reasoning_effort` only when you want to change the inherited values:
 
 ```bash
-codex exec -c model_reasoning_effort=high resume <SESSION_ID> "prompt"
+codex exec -s read-only resume <SESSION_ID> "prompt"
 ```
+
+**`-s/--sandbox` must go before the `resume` subcommand.** `resume` accepts `-c` and `-m` on either side, but **not `-s/--sandbox`** — that's a `codex exec`-only flag, so placing it after `resume` fails with exit 2 (`unexpected argument`). Combined with the no-inheritance fact above, this means: always put `-s read-only` (and any global flag) before `resume`. (`--skip-git-repo-check` is a genuine `resume` flag and may follow the session ID when running outside a trusted git directory.)
 
 ### Default command structure
 ```bash
-codex exec -s read-only \
+LOG=$(mktemp) && codex exec -s read-only \
   -c model_reasoning_effort=high \
-  "prompt" 2>/tmp/codex_stderr.log \
-  && echo "SESSION_ID=$(grep 'session id:' /tmp/codex_stderr.log | tail -1 | awk '{print $NF}')"
+  "prompt" 2>"$LOG" \
+  && SESSION_ID=$(awk '/session id:/{id=$NF} END{if(id) print id; else exit 1}' "$LOG") \
+  && echo "SESSION_ID=$SESSION_ID" \
+  || cat "$LOG"
 ```
 
-`stderr` redirection diverts session header / token stats / reasoning summaries to a log file so they don't pollute Claude's context. The trailing `echo` puts the session id where future turns can find it (Claude's conversation context).
+`stderr` redirection diverts session header / token stats / reasoning summaries to a per-call log file (via `mktemp`) so they don't pollute Claude's context and parallel calls can't clobber each other. The trailing `awk`+`echo` puts the session id where future turns can find it (Claude's conversation context), and fails the chain rather than recording a blank id if none was parsed. `|| cat "$LOG"` then surfaces the captured stderr on failure — keep it instead of `2>/dev/null`, which would hide the error. Long high-reasoning runs can exceed a 2-minute foreground timeout — run them in the background and read the log when notified.
 
 ## Plugin Installation Flow
 

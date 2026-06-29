@@ -1,7 +1,7 @@
 {
   "name": "cc-skill-codex",
   "description": "Invoke Codex CLI as a peer coding agent. Strongest fit: adversarial / steerable code review, deep design analysis, debugging investigations, and delegated tasks. Supports session continuation across Claude Code restarts.",
-  "version": "3.2.0",
+  "version": "3.2.8",
   "author": {
     "name": "wywwzjj"
   }
