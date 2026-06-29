@@ -21,13 +21,12 @@ Codex is a peer coding agent invoked via `codex exec`. Both Codex and Claude can
 ## Default Command
 
 ```bash
-LOG=$(mktemp) && codex exec -s read-only \
-  -c model_reasoning_effort=high \
-  "prompt" 2>"$LOG" \
-  && SESSION_ID=$(awk '/session id:/{id=$NF} END{if(id) print id; else exit 1}' "$LOG") \
-  && echo "SESSION_ID=$SESSION_ID" \
-  || cat "$LOG"
+LOG=$(mktemp) && codex exec -s read-only -c model_reasoning_effort=high 2>"$LOG" <<'EOF' && SESSION_ID=$(awk '/session id:/{id=$NF} END{if(id) print id; else exit 1}' "$LOG") && echo "SESSION_ID=$SESSION_ID" || cat "$LOG"
+Your prompt here. Multi-line is fine — that's why this uses a heredoc (Rule #3).
+EOF
 ```
+
+The heredoc is the default form because Codex prompts (review/design/debug instructions) are almost always multi-line. For a genuinely one-line prompt you may swap the `<<'EOF' … EOF` for a quoted `"prompt"` argument before `2>"$LOG"` — everything else stays identical.
 
 The `SESSION_ID=…` tail is **load-bearing**: it lifts the session ID from the per-call log into stdout, where it becomes part of the conversation context. Future turns can then resume by ID without re-grepping. Three deliberate details:
 - `LOG=$(mktemp)` gives each invocation its own log file, so parallel Codex calls can't clobber each other's session id.
