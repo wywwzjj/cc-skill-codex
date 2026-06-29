@@ -258,6 +258,6 @@ For the plugin docs, see:
 ---
 
 **License**: Apache 2.0
-**Version**: 3.2.9
+**Version**: 3.2.10
 **Codex CLI**: v0.142+
 **Positioning**: Codex as a peer coding agent — flagship use case is adversarial / steerable code review.

@@ -5,7 +5,7 @@ description: Invoke Codex CLI (`codex exec`) as a peer coding agent. Strongest f
 
 # Codex CLI Integration
 
-Codex is a peer coding agent invoked via `codex exec`. Both Codex and Claude can read and write code — pick by task fit, not by role. The flagship use case is **adversarial / steerable code review**: not line-level nitpicks, but challenging the design itself.
+Codex is a peer coding agent invoked via `codex exec` — pick Codex vs. Claude by task fit, not role. Flagship use: **adversarial / steerable code review** — challenge the design, not just nitpick lines.
 
 > Verified against Codex CLI **v0.142.2**. Commands rarely change, but on older builds confirm with `codex --help` / `codex exec --help`. The `codex exec review` subcommand in particular needs a recent build.
 
@@ -28,12 +28,9 @@ EOF
 
 The heredoc is the default form because Codex prompts (review/design/debug instructions) are almost always multi-line. For a genuinely one-line prompt you may swap the `<<'EOF' … EOF` for a quoted `"prompt"` argument before `2>"$LOG"` — everything else stays identical.
 
-The `SESSION_ID=…` tail is **load-bearing**: it lifts the session ID from the per-call log into stdout, where it becomes part of the conversation context. Future turns can then resume by ID without re-grepping. Three deliberate details:
-- `LOG=$(mktemp)` gives each invocation its own log file, so parallel Codex calls can't clobber each other's session id.
-- The `awk … END{… else exit 1}` form **fails the chain if no session id was found** (rather than `echo`-ing an empty `SESSION_ID=`). So a format change or empty log surfaces immediately as a non-zero exit instead of silently recording a blank id.
-- The trailing `|| cat "$LOG"` fires on any failure in the chain (codex errored, or no id parsed) and **surfaces the captured stderr**, so a failure is debuggable instead of silent. On success it never runs, keeping the log noise out of context.
+The `SESSION_ID=…` tail is **load-bearing** — it lifts the session ID into stdout (and thus context) so future turns resume by ID without re-grepping. **Don't simplify the chain**; each piece is deliberate: `LOG=$(mktemp)` keeps parallel calls from clobbering each other's id; `awk … else exit 1` fails the chain rather than echoing a blank `SESSION_ID=`; `|| cat "$LOG"` surfaces stderr on any failure (codex error *or* unparsed id) and never runs on success.
 
-For long high-reasoning runs, expect calls to exceed a 2-minute foreground timeout — run them in the background and read the log on completion rather than raising the timeout blindly.
+Long high-reasoning runs can exceed a 2-minute foreground timeout — run them in the background and read the log on completion.
 
 Default to **read-only** — most Codex invocations are analysis or review. Use `-s workspace-write` only when the user explicitly delegates a fix/refactor to Codex.
 
@@ -59,11 +56,11 @@ Focus: <user's specific concern, e.g., "the retry/caching strategy">
 EOF
 ```
 
-This pays off most when **steered at a real risk area**. Always weave the user's specific focus into the prompt — generic adversarial review is much weaker than focused.
+Pays off most when **steered at a real risk area** — weave the user's specific focus into the prompt; generic review is much weaker.
 
 ### `codex exec review` — diff-scoped review
 
-There's a purpose-built review subcommand that auto-collects a diff so you don't hand-assemble one into the prompt:
+A purpose-built subcommand that auto-collects a diff so you don't hand-assemble one:
 
 ```bash
 LOG=$(mktemp) && codex exec review -c sandbox_mode=read-only --uncommitted 2>"$LOG" || cat "$LOG"
@@ -74,9 +71,7 @@ Two gotchas:
 - **Scope flags can't combine with a custom `[PROMPT]`** — `--uncommitted`/`--base`/`--commit` plus a prompt fails with exit 2 (`cannot be used with '[PROMPT]'`). So `review` gives you *either* diff-scoping *or* steering, not both.
 - **`review` rejects `-s` but does NOT default to read-only** — it takes no `-s/--sandbox`, yet applies your *configured* default sandbox, which may be `danger-full-access`. A review never needs to write, so pin it with `-c sandbox_mode=read-only` (shown above). `-c` and `-m` are accepted.
 
-The example above is fire-and-forget (stderr is hidden on success, so the emitted `session id:` is discarded). `review` *does* start a resumable session, so **if you expect follow-ups, swap in the Default Command's full capture tail** (`&& SESSION_ID=$(awk …) && echo … || cat "$LOG"`) to retain the id.
-
-Because the flagship value here is **steered, adversarial** review, prefer the free-form `codex exec` form above (your own prompt, referencing specific files/diffs) whenever you need to direct the review. Reach for `codex exec review` only for a quick default-style pass over a precise diff scope.
+This is fire-and-forget — the session id is discarded on success; for follow-ups, add the Default Command's capture tail (`&& SESSION_ID=$(awk …) … || cat "$LOG"`) to retain it. Use `review` only for quick, **unsteered** diff-scoped passes; when you need to steer the review, use the free-form `codex exec` form above.
 
 ## Session Continuation
 
@@ -116,11 +111,8 @@ Other constraints:
 **Flag ordering — `-s/--sandbox` is the trap.** `resume` accepts `-c` and `-m` (before *or* after the ID), but **not `-s/--sandbox`** — that's a `codex exec`-only flag, and placing it after `resume` fails with exit 2 (`unexpected argument`). Since you must re-pin `-s read-only` on every resume (Rule #5), the simplest rule is: **put every global flag before `resume`**.
 
 ```bash
-# Correct — flags precede `resume`
-codex exec -s read-only resume <SESSION_ID> "prompt"
-
-# Wrong — `-s` after `resume` → exit 2 (note: `-c`/`-m` here would have been fine)
-codex exec resume <SESSION_ID> -s read-only "prompt"
+codex exec -s read-only resume <SESSION_ID> "prompt"   # correct
+codex exec resume <SESSION_ID> -s read-only "prompt"   # wrong: exit 2 (-c/-m here would be fine)
 ```
 
 If Codex is run outside a trusted git directory, add `--skip-git-repo-check` (this one *is* a valid `resume` flag and may go after the ID).
@@ -141,11 +133,4 @@ If Codex is run outside a trusted git directory, add `--skip-git-repo-check` (th
 
 ## Optional Local Verification
 
-For version-sensitive CLI details, check your installed Codex directly:
-
-```bash
-codex --help
-codex exec --help
-codex exec resume --help
-codex features list
-```
+For version-sensitive details, check your installed Codex directly: `codex --help`, `codex exec --help`, `codex exec resume --help`, `codex features list`.
