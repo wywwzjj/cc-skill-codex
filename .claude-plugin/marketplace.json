@@ -1,13 +1,19 @@
 {
   "name": "cc-skill-codex-marketplace",
+  "description": "Dual-direction peer-agent skills: Claude Code invokes Codex CLI (cc-skill-codex) and Codex CLI invokes Claude Code (codex-skill-claude). Flagship use case: adversarial / steerable code review.",
   "owner": {
     "name": "wywwzjj"
   },
   "plugins": [
     {
       "name": "cc-skill-codex",
-      "source": "./",
-      "description": "Invoke Codex CLI as a peer coding agent. Strongest fit: adversarial / steerable code review, deep design analysis, debugging investigations, and delegated tasks. Supports session continuation across Claude Code restarts."
+      "source": "./plugins/cc-skill-codex",
+      "description": "For Claude Code: invoke Codex CLI as a peer coding agent — adversarial code review, design analysis, debugging, delegated tasks."
+    },
+    {
+      "name": "codex-skill-claude",
+      "source": "./plugins/codex-skill-claude",
+      "description": "For Codex CLI: invoke Claude Code as a peer coding agent — adversarial code review, design analysis, debugging, delegated tasks."
     }
   ]
 }

@@ -1,0 +1,11 @@
+{
+  "name": "cc-skill-codex",
+  "description": "For Claude Code: invoke Codex CLI as a peer coding agent — adversarial code review, design analysis, debugging, delegated tasks. Sessions resume across restarts.",
+  "version": "3.3.1",
+  "author": {
+    "name": "wywwzjj"
+  },
+  "repository": "https://github.com/wywwzjj/cc-skill-codex",
+  "license": "Apache-2.0",
+  "keywords": ["codex", "code-review", "adversarial-review", "peer-agent"]
+}

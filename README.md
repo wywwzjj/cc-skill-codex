@@ -1,55 +1,91 @@
 # cc-skill-codex
 
-A Claude Code **plugin** that provides a skill for seamless OpenAI Codex CLI integration. The skill uses whatever model Codex CLI is configured to default to — no model is pinned by the skill itself.
+A dual-direction peer-agent marketplace: **two plugins** that let Claude Code and OpenAI Codex CLI call each other as peer coding agents. Neither skill pins a model — each uses whatever the callee CLI is configured to default to.
 
-**Positioning**: Codex is a peer coding agent. Strongest fit is **adversarial / steerable code review**; also useful for standard review, deep design analysis, debugging investigations, and delegated tasks. Both Codex and Claude can read and write code — pick by task fit, not by role.
+| Plugin | Direction | Install into | Skill |
+|--------|-----------|--------------|-------|
+| `cc-skill-codex` | Claude → Codex (`codex exec`) | Claude Code | `codex` |
+| `codex-skill-claude` | Codex → Claude (`claude -p`) | Codex CLI | `claude` |
 
-**Codex CLI Version**: v0.142.2 (verified; v0.142+ recommended)
+**Positioning** (both directions): the callee is a peer coding agent. Strongest fit is **adversarial / steerable code review**; also useful for standard review, deep design analysis, debugging investigations, and delegated tasks. Both agents can read and write code — pick by task fit, not by role.
+
+**Verified versions**: Codex CLI v0.142.2 (skill commands) / v0.145.0 (plugin install); Claude Code v2.1.206.
 
 ## What is this?
 
-**cc-skill-codex** is a Claude Code **plugin** that contains the **codex skill**. When you install this plugin, you get access to the skill that enables Codex CLI integration.
+One repository serves both ecosystems: Codex CLI's plugin system reads Claude's `.claude-plugin/marketplace.json` and `.claude-plugin/plugin.json` directly, so the same marketplace installs into either agent. The two directions are **separate plugins** on purpose — an installed plugin loads *all* its skills into the host agent, so bundling both skills in one plugin would give each agent a wrong-direction skill.
 
 - **Marketplace name**: `cc-skill-codex-marketplace`
-- **Plugin name**: `cc-skill-codex`
-- **Full plugin identifier**: `cc-skill-codex@cc-skill-codex-marketplace`
-- **Skill name**: `codex`
-- **Installation**: Via Claude Code marketplace (installs the plugin, which includes the skill)
+- **For Claude Code users**: install `cc-skill-codex@cc-skill-codex-marketplace` → get the `codex` skill
+- **For Codex CLI users**: install `codex-skill-claude@cc-skill-codex-marketplace` → get the `claude` skill
+
+> Known limitation: both hosts can *see* both plugins in the marketplace listing — nothing enforces the pairing. Installing the wrong direction (e.g. `codex-skill-claude` into Claude Code) gives the host a skill for calling *itself* — unsupported, and a self-call could recurse or burn tokens pointlessly. Install only your own direction.
 
 ## Repository Structure
 
 ```
-cc-skill-codex/                  # Plugin root
-├── .claude-plugin/              # Plugin metadata
-│   ├── plugin.json             # Plugin configuration
-│   └── marketplace.json        # Marketplace configuration
-├── README.md                    # This file - installation and usage guide
-├── LICENSE                      # Apache 2.0 license
-└── skills/                      # Skills provided by this plugin
-    └── codex/                  # The "codex" skill
-        └── SKILL.md            # Main skill definition (loaded by Claude Code)
+cc-skill-codex-marketplace/          # Marketplace root (served to both agents)
+├── .claude-plugin/
+│   └── marketplace.json             # Marketplace configuration: lists both plugins
+├── plugins/
+│   ├── cc-skill-codex/              # Claude → Codex plugin
+│   │   ├── .claude-plugin/plugin.json
+│   │   └── skills/codex/
+│   │       ├── SKILL.md             # Loaded by Claude Code
+│   │       └── scripts/codex-ask.sh # Wrapper: answer + SESSION_ID + DETAILS
+│   └── codex-skill-claude/          # Codex → Claude plugin
+│       ├── .claude-plugin/plugin.json
+│       └── skills/claude/
+│           ├── SKILL.md             # Loaded by Codex CLI
+│           └── scripts/claude-ask.sh # Wrapper: answer + SESSION_ID + DETAILS
+├── README.md                        # This file - installation and usage guide
+└── LICENSE                          # Apache 2.0 license
 ```
 
 **How it works**:
-1. You add the **marketplace** (`cc-skill-codex-marketplace`) from GitHub
-2. You install the **plugin** (`cc-skill-codex`) from the marketplace
-3. The plugin provides the **skill** (`codex`)
-4. Claude Code loads `skills/codex/SKILL.md` when the skill is invoked
-5. `skills/codex/SKILL.md` is the primary maintained documentation surface
+1. You add the **marketplace** (`cc-skill-codex-marketplace`) from GitHub — in Claude Code *or* Codex CLI
+2. You install the **plugin for your direction** (`cc-skill-codex` or `codex-skill-claude`)
+3. The plugin provides the **skill** (`codex` or `claude`)
+4. The host agent loads the plugin's `SKILL.md` when the skill is invoked
+5. Each `SKILL.md` is the primary maintained documentation surface for its direction
 
 ---
 
-## Installation in Claude Code
+## Installation in Codex CLI (codex-skill-claude)
+
+Prerequisites: Claude Code installed and authenticated (`claude --version`; run `claude` once interactively to log in), Codex CLI v0.145+ (for `codex plugin`), `python3` on PATH (used by the wrapper script to parse Claude's JSON output).
+
+```bash
+# 1. Add the marketplace
+codex plugin marketplace add wywwzjj/cc-skill-codex
+
+# 2. Install the plugin
+codex plugin add codex-skill-claude@cc-skill-codex-marketplace
+
+# Verify / manage
+codex plugin list
+codex plugin remove codex-skill-claude@cc-skill-codex-marketplace   # full id required
+```
+
+Then, in Codex: *"Use Claude to challenge the caching design in src/api/client.ts"*. The skill invokes Claude through its wrapper script (`claude-ask.sh`), which prints only the answer plus `SESSION_ID=`/`DETAILS=` trailer lines and persists the full JSON envelope and stderr for on-demand inspection. Claude runs with its own configured defaults — the skill imposes no tool or permission restrictions. See `plugins/codex-skill-claude/skills/claude/SKILL.md` for the full workflow.
+
+> Heads-up: `claude -p` needs network access and writes session state to `~/.claude` — if your Codex session runs in a sandbox that blocks either, run Codex with network enabled for these commands.
+
+---
+
+## Installation in Claude Code (cc-skill-codex)
 
 ### Prerequisites
 
 1. **Codex CLI** installed and authenticated:
    ```bash
-   codex --version  # v0.142+ recommended
+   codex --version  # v0.145+ recommended (wrapper script uses `codex exec --json`; v0.142 works via the SKILL.md inline fallback)
    codex login
    ```
 
 2. **Claude Code** installed and running
+
+3. **python3** on PATH (used by the wrapper script to parse the Codex event stream)
 
 ### Installation Methods
 
@@ -80,6 +116,17 @@ cc-skill-codex/                  # Plugin root
 # 2. Install the plugin
 /plugin install cc-skill-codex@cc-skill-codex-marketplace
 ```
+
+### Upgrading from v3.2.x or earlier
+
+v3.3.0 moved the plugin from the repository root into `plugins/cc-skill-codex/` (to make room for the second plugin). Marketplace-based installs migrate via the normal update path:
+
+```bash
+/plugin marketplace update cc-skill-codex-marketplace
+/plugin update cc-skill-codex@cc-skill-codex-marketplace
+```
+
+If you loaded the plugin by pointing directly at the repository root (e.g. `--plugin-dir <repo>`), update the path to `<repo>/plugins/cc-skill-codex`.
 
 ### Verify Installation
 
@@ -160,7 +207,7 @@ The strongest reason to reach for Codex: pressure-test a design rather than nitp
 ```
 
 Codex will:
-1. Execute a read-only `codex exec` with a steered prompt that explicitly asks it to challenge the design, surface hidden assumptions, and identify failure modes
+1. Execute `codex exec` (via the wrapper script) with a steered prompt that explicitly asks it to challenge the design, surface hidden assumptions, and identify failure modes
 2. Return concrete risks (race conditions, data loss paths, auth weaknesses, reliability cliffs) with reasoning
 3. Often suggest where a different design would have been safer or simpler
 
@@ -188,31 +235,31 @@ Codex returns its findings; you (or Claude) decide what to do with them. Codex c
 ```
 
 Codex will:
-1. Resume the prior session **by ID** (not `--last`): `LOG=$(mktemp) && codex exec -s read-only resume <SESSION_ID> "Pressure-test the rollback path under partial failure" 2>"$LOG" || cat "$LOG"` — note `-s read-only` is re-pinned because sandbox is **not** inherited on resume
+1. Resume the prior session **by ID** (not `--last`): `bash "${CLAUDE_SKILL_DIR}/scripts/codex-ask.sh" resume <SESSION_ID> "Pressure-test the rollback path under partial failure"`
 2. Resume with full context from the previous session — same target code, same prior reasoning
 3. Build on what was already challenged rather than starting over
 
-**Why ID-based resume matters**: `--last` resumes the globally most recent Codex session and races with any other Codex call (parallel reviews, the user invoking Codex directly, background tasks). The skill captures the session ID at the end of each new run by appending `&& SESSION_ID=$(awk '/session id:/{id=$NF} END{if(id) print id; else exit 1}' "$LOG") && echo "SESSION_ID=$SESSION_ID"`, where `LOG=$(mktemp)` is a per-call log file — that ID stays in Claude's context for follow-ups. A per-invocation `mktemp` (not a shared fixed path) keeps parallel Codex calls from clobbering each other's session id. `--last` is reserved as a fallback for when the ID is genuinely unrecoverable.
+**Why ID-based resume matters**: `--last` resumes the most recent Codex session and races with any other Codex call (parallel reviews, the user invoking Codex directly, background tasks). The wrapper script prints a `SESSION_ID=<id>` line after every successful run — taken from the structured `thread.started` event, not scraped from stderr text — and that ID stays in Claude's context for follow-ups. If it ever scrolls out of context, it's still recoverable from the run's `DETAILS` directory (`events.jsonl`); `--last` is the final fallback.
 
 **Why session continuation matters**: Codex sessions persist across Claude Code restarts. Multi-day reviews and investigations stay coherent — you can resume days later with full prior context.
 
 ### Step 8: Debug Investigation or Delegated Task
 
-**Debug investigation** (read-only):
+**Debug investigation**:
 ```
 > Use Codex to investigate why my queue implementation deadlocks under high concurrency
 ```
 
 Codex will trace the bug end-to-end and propose root cause + fix. You can then apply the fix yourself (with Claude) for tight control.
 
-**Delegated task** (workspace-write — Codex actually writes the patch):
+**Delegated task** (Codex actually writes the patch):
 ```
 > Have Codex fix the deadlock in queue.py — apply the smallest safe patch
 ```
 
-When the user clearly says "have Codex fix" or "let Codex patch", invoke with `-s workspace-write` and let Codex own the change.
+When the user clearly says "have Codex fix" or "let Codex patch", let Codex own the change. Whether Codex may write is governed by your configured sandbox in `~/.codex/config.toml` — the skill doesn't override it.
 
-**Tradeoff**: read-only investigation gives Claude/you full control over the patch; delegated workspace-write is faster but Codex picks the implementation. Pick by how much you trust the local context vs. value the speed.
+**Tradeoff**: investigation-then-apply gives Claude/you full control over the patch; a delegated fix is faster but Codex picks the implementation. Pick by how much you trust the local context vs. value the speed.
 
 ---
 
@@ -220,8 +267,7 @@ When the user clearly says "have Codex fix" or "let Codex patch", invoke with `-
 
 ### Workflow Pattern
 - **Adversarial / steerable review** is the flagship — challenge designs, pressure-test tradeoffs, find hidden risks
-- **The skill pins `-s read-only` by default** — most invocations are analysis, review, or investigation. Always pin it explicitly; Codex CLI's *configured* default may be more permissive (often `danger-full-access`)
-- **Use `-s workspace-write` only when delegating a fix** — when the user explicitly says "have Codex fix it"
+- **No restriction flags** — the skill passes no `-s`; Codex runs with the sandbox configured in your `~/.codex/config.toml`. Pass `-s` yourself only when you want a specific mode for a specific call
 - **Pick by task fit, not by role** — both Codex and Claude can read and write code
 
 ### Triggering the Skill
@@ -231,7 +277,7 @@ When the user clearly says "have Codex fix" or "let Codex patch", invoke with `-
 
 ### Model Usage
 - **Model**: The skill does not pin a model — Codex CLI's current default is used (whichever model your installed Codex version ships with). To override, pass `-m <model>`.
-- **Reasoning effort**: New sessions use `model_reasoning_effort=high` by default; resumed sessions inherit the original session's model + reasoning effort, but **not** its sandbox — re-pin `-s read-only` on every resume.
+- **Reasoning effort**: New sessions use `model_reasoning_effort=high` by default; resumed sessions inherit the original session's model + reasoning effort.
 
 ### Session Continuation
 - **Keywords**: "continue", "resume", "add to that", "keep going"
@@ -253,11 +299,13 @@ When the user clearly says "have Codex fix" or "let Codex patch", invoke with `-
 ## Documentation
 
 For the plugin docs, see:
-- `skills/codex/SKILL.md` - Main skill definition, command patterns, and common failure guidance
+- `plugins/cc-skill-codex/skills/codex/SKILL.md` - Claude → Codex: skill definition, command patterns, and common failure guidance
+- `plugins/codex-skill-claude/skills/claude/SKILL.md` - Codex → Claude: skill definition, command patterns, and common failure guidance
 
 ---
 
 **License**: Apache 2.0
-**Version**: 3.2.10
-**Codex CLI**: v0.142+
-**Positioning**: Codex as a peer coding agent — flagship use case is adversarial / steerable code review.
+**Versions**: cc-skill-codex 3.3.1 · codex-skill-claude 1.0.1
+**Codex CLI**: v0.145+ recommended (`codex plugin`, `codex exec --json`); base commands verified on v0.142.2 · **Claude Code**: verified on v2.1.206
+**Runtime dependency**: `python3` on PATH (both wrapper scripts)
+**Positioning**: peer coding agents in both directions — flagship use case is adversarial / steerable code review.
